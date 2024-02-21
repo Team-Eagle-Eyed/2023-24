@@ -1,39 +1,42 @@
 package frc.robot.commands;
 
 import com.ctre.phoenix6.Orchestra;
-import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
 
 
 public class MusicPlayer extends Command {
     private Orchestra orchestra;
-    private Swerve m_Swerve;
+    private String track;
 
-    public MusicPlayer(Swerve m_swerve) {
+    public MusicPlayer(Swerve m_swerve, String track) {
         addRequirements(m_swerve);
-        this.m_Swerve = m_swerve;
+        this.orchestra = m_swerve.getOrchestra();
+        this.track = track;
+        SmartDashboard.putBoolean("isPlaying", false);
     }
     
     @Override
     public void initialize() {
-        orchestra = new Orchestra();
-        orchestra.loadMusic("imperial_march.chrp");
-        for (TalonFX motor : m_Swerve.getModuleDriveMotors()) {
-            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
-        }
-        for (TalonFX motor : m_Swerve.getModuleAngleMotors()) {
-            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
-        }
+        orchestra.loadMusic(track);
     }
 
     @Override
     public void execute() {
         orchestra.play();
+        SmartDashboard.putBoolean("isPlaying", orchestra.isPlaying());
     }
 
-    public void stopMusic() {
+    @Override
+    public void end(boolean interrupted) {
         orchestra.stop();
+        SmartDashboard.putBoolean("isPlaying", orchestra.isPlaying());
+    }
+
+    @Override
+    public boolean isFinished() {
+        return !orchestra.isPlaying();
     }
 }

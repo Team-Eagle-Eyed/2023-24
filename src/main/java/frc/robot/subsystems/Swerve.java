@@ -8,14 +8,20 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -37,6 +43,33 @@ public class Swerve extends SubsystemBase {
         };
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions());
+
+        AutoBuilder.configureHolonomic(
+            this::getPose, // Robot pose supplier
+            this::setPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                    Constants.Swerve.maxSpeed, // Max module speed, in m/s
+                    //TODO: Check math below
+                    Math.sqrt(Math.pow(Constants.Swerve.trackWidth, 2) + Math.pow(Constants.Swerve.wheelBase, 2)), // Drive base radius in meters. Distance from robot center to furthest module.
+                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+            ),
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -58,7 +91,19 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
-    }    
+    }
+    
+    public void driveRobotRelative(ChassisSpeeds translation) {
+        SwerveModuleState[] swerveModuleStates =
+            Constants.Swerve.swerveKinematics.toSwerveModuleStates(
+                translation
+            );
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+
+        for(SwerveModule mod : mSwerveMods){
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
+        }
+    }
 
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -85,7 +130,7 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-    public TalonFX[] getModuleDriveMotors() {
+    private TalonFX[] getModuleDriveMotors() {
         TalonFX[] motors = new TalonFX[4];
         for (SwerveModule mod : mSwerveMods) {
             motors[mod.moduleNumber] = mod.getDriveMotor();
@@ -93,12 +138,27 @@ public class Swerve extends SubsystemBase {
         return motors;
     }
 
-    public TalonFX[] getModuleAngleMotors() {
+    private TalonFX[] getModuleAngleMotors() {
         TalonFX[] motors = new TalonFX[4];
         for (SwerveModule mod : mSwerveMods) {
             motors[mod.moduleNumber] = mod.getAngleMotor();
         }
         return motors;
+    }
+
+    public Orchestra getOrchestra() {
+        Orchestra orchestra = new Orchestra();
+        for (TalonFX motor : getModuleDriveMotors()) {
+            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
+        }
+        for (TalonFX motor : getModuleAngleMotors()) {
+            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
+        }
+        return orchestra;
+    }
+
+    public ChassisSpeeds getRobotRelativeSpeeds() {
+        return Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates());
     }
 
     public Pose2d getPose() {
