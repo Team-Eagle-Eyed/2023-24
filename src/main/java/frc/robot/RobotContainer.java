@@ -55,6 +55,8 @@ public class RobotContainer {
     public RobotContainer() {
 
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
+        musicSelector.addOption("Megalovania", "megalovania.chrp");
+        musicSelector.addOption("Night on Bald Mountain", "night_on_bald_mountain.chrp");
 
         autoChooser = AutoBuilder.buildAutoChooser();
         
