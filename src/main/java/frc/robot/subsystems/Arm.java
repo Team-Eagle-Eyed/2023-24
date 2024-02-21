@@ -22,16 +22,23 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Left Arm Motor", leftMotor.get());
         SmartDashboard.putNumber("Right Arm Motor", rightMotor.get());
+        SmartDashboard.putNumber("Left Motor position", leftMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Left Motor absolute position", leftMotor.getAbsoluteEncoder().getPosition());
     }
 
     private void configureMotors() {
+        leftMotor.restoreFactoryDefaults();
+        rightMotor.restoreFactoryDefaults();
+
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
 
         rightMotor.follow(leftMotor, true);
 
-        leftMotor.setSoftLimit(SoftLimitDirection.kForward, 247);
-        leftMotor.getAbsoluteEncoder().setPositionConversionFactor(1);
+        leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition() - 0.686); //TODO: Is this right?
+
+        leftMotor.setSoftLimit(SoftLimitDirection.kForward, 10); //TODO: Tune this
+        leftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
 
         leftMotor.setSmartCurrentLimit(7);
         rightMotor.setSmartCurrentLimit(7);
