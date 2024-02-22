@@ -36,6 +36,7 @@ public class Arm extends SubsystemBase {
         rightMotor.follow(leftMotor, true);
 
         leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition() - 0.686); //TODO: Is this right?
+        // position conversion factor
 
         leftMotor.setSoftLimit(SoftLimitDirection.kForward, 10); //TODO: Tune this
         leftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);

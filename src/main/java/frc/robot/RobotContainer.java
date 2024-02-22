@@ -57,6 +57,9 @@ public class RobotContainer {
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");
         musicSelector.addOption("Night on Bald Mountain", "night_on_bald_mountain.chrp");
+        musicSelector.addOption("Sandstorm", "sandstorm.chrp");
+        musicSelector.addOption("Mii Channel", "mii_channel.chrp");
+        musicSelector.addOption("William Tell Overture", "william_tell_overture_finale.chrp");
 
         autoChooser = AutoBuilder.buildAutoChooser();
         
