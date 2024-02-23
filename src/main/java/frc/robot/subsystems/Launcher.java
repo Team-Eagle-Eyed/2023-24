@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Launcher extends SubsystemBase {
@@ -22,6 +24,7 @@ public class Launcher extends SubsystemBase {
     @Override
     public void periodic() {
         // Stuff to run repeatedly
+        SmartDashboard.putNumber("Launcher velocity", outtakeBottom.getEncoder().getVelocity());
     }
 
     private void configureMotors() {
@@ -34,15 +37,27 @@ public class Launcher extends SubsystemBase {
         intakeTop.setOpenLoopRampRate(0.25);
         outtakeBottom.setOpenLoopRampRate(1);
         outtakeTop.setOpenLoopRampRate(1);
+
+        intakeTop.follow(intakeBottom, true);
+
+        outtakeTop.follow(outtakeBottom, true);
     }
 
     public void intake(double speed) {
         intakeBottom.set(speed);
-        intakeTop.set(-speed);
+        // intakeTop.set(-speed);
     }
 
     public void outtake(double speed) {
         outtakeBottom.set(speed);
-        outtakeTop.set(-speed);
+        // outtakeTop.set(-speed);
+    }
+
+    public SparkPIDController getIntakePID() {
+        return intakeBottom.getPIDController();
+    }
+
+    public SparkPIDController getOuttakePID() {
+        return outtakeBottom.getPIDController();
     }
 }

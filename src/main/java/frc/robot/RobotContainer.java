@@ -43,11 +43,11 @@ public class RobotContainer {
     private final int outtakeAxis = XboxController.Axis.kRightTrigger.value;
 
     /* Operator Buttons */
-    
+    private final JoystickButton spinUpLauncher = new JoystickButton(operator, XboxController.Button.kA.value);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
-    // private final Photonvision s_Photonvision = new Photonvision("changeMe");
+    private final Photonvision s_Photonvision = new Photonvision("changeMe");
     private final Arm s_Arm = new Arm();
     private final Launcher s_Launcher = new Launcher();
 
@@ -113,7 +113,8 @@ public class RobotContainer {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
-        // centerNote.whileTrue(new CenterNote(s_Swerve, s_Photonvision));
+        centerNote.whileTrue(new CenterNote(s_Swerve, s_Photonvision));
+        spinUpLauncher.whileTrue(new SetLauncherVelocity(s_Launcher, () -> SmartDashboard.getNumber("Launcher velocity", 1000)));
     }
 
     /**
