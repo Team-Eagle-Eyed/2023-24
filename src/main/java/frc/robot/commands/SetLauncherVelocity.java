@@ -33,7 +33,8 @@ public class SetLauncherVelocity extends Command {
     @Override
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
-        launcher.intake(0);
+        launcher.outtake(0);
+        launcher.getOuttakePID().setReference(0, ControlType.kVelocity);
     }
 
     @Override
