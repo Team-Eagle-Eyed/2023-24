@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import com.ctre.phoenix6.Orchestra;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
@@ -9,9 +10,9 @@ import frc.robot.subsystems.Swerve;
 
 public class MusicPlayer extends Command {
     private Orchestra orchestra;
-    private String track;
+    private SendableChooser<String> track;
 
-    public MusicPlayer(Swerve m_swerve, String track) {
+    public MusicPlayer(Swerve m_swerve, SendableChooser<String> track) {
         addRequirements(m_swerve);
         this.orchestra = m_swerve.getOrchestra();
         this.track = track;
@@ -20,7 +21,7 @@ public class MusicPlayer extends Command {
     
     @Override
     public void initialize() {
-        orchestra.loadMusic(track);
+        orchestra.loadMusic(track.getSelected());
     }
 
     @Override

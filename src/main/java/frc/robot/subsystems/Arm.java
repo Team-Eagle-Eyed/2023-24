@@ -33,16 +33,15 @@ public class Arm extends SubsystemBase {
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
 
-        rightMotor.follow(leftMotor, true);
+        leftMotor.getEncoder().setPositionConversionFactor(1 / (5 * 4 * 3 * 3));
+        leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition() - 0.1433); //TODO: Is this right? //0.143
+        leftMotor.getAbsoluteEncoder().setPositionConversionFactor(365);
 
-        leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition() - 0.686); //TODO: Is this right?
-        // position conversion factor
+        // leftMotor.setSoftLimit(SoftLimitDirection.kForward, 0); //TODO: Tune this
+        // leftMotor.setSoftLimit(SoftLimitDirection.kReverse, 10); //TODO: Tune this
 
-        leftMotor.setSoftLimit(SoftLimitDirection.kForward, 10); //TODO: Tune this
-        leftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
-
-        leftMotor.setSmartCurrentLimit(7);
-        rightMotor.setSmartCurrentLimit(7);
+        leftMotor.setSmartCurrentLimit(10);
+        rightMotor.setSmartCurrentLimit(10);
 
         leftMotor.burnFlash();
         rightMotor.burnFlash();
@@ -50,5 +49,6 @@ public class Arm extends SubsystemBase {
 
     public void drive(double speed) {
         leftMotor.set(speed);
+        rightMotor.set(-speed);
     }
 }
