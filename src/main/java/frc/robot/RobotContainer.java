@@ -74,6 +74,8 @@ public class RobotContainer {
         SmartDashboard.putData("Music Selector", musicSelector);
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
+        SmartDashboard.putNumber("Launcher velocity", 1000);
+
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
@@ -114,7 +116,7 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
         centerNote.whileTrue(new CenterNote(s_Swerve, s_Photonvision));
-        spinUpLauncher.whileTrue(new SetLauncherVelocity(s_Launcher, () -> SmartDashboard.getNumber("Launcher velocity", 1000)));
+        spinUpLauncher.whileTrue(new SetLauncherVelocity(s_Launcher, () -> SmartDashboard.getNumber("Launcher velocity", 0)));
     }
 
     /**
