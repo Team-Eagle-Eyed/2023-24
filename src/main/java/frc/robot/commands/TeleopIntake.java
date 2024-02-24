@@ -3,40 +3,49 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.Launcher;
+import frc.robot.subsystems.Intake;
 
 
 public class TeleopIntake extends Command {
 
-    private Launcher launcher;
+    private Intake intake;
     private DoubleSupplier intakeSpeed;
-    private DoubleSupplier outtakeSpeed;
+    private DigitalInput noteSensor;
+    private Boolean objectPresent;
 
-    public TeleopIntake(Launcher launcher, DoubleSupplier intakeSpeed, DoubleSupplier outtakeSpeed) {
-        addRequirements(launcher);
-        this.launcher = launcher;
+    public TeleopIntake(Intake intake, DoubleSupplier intakeSpeed) {
+        addRequirements(intake);
+        this.intake = intake;
         this.intakeSpeed = intakeSpeed;
-        this.outtakeSpeed = outtakeSpeed;
+        noteSensor = new DigitalInput(0);
     }
     
     @Override
     public void initialize() {
         // Runs once on start
+        objectPresent = false;
     }
 
     @Override
     public void execute() {
         // Runs repeatedly after initialization
-        launcher.intake(MathUtil.applyDeadband(intakeSpeed.getAsDouble(), Constants.stickDeadband));
-        launcher.outtake(MathUtil.applyDeadband(outtakeSpeed.getAsDouble(), Constants.stickDeadband));
+        // intake.intake(MathUtil.applyDeadband(intakeSpeed.getAsDouble(), Constants.stickDeadband));
+        double output = MathUtil.applyDeadband(intakeSpeed.getAsDouble(), Constants.stickDeadband);
+        if(noteSensor.get() || objectPresent) {
+            intake.intake(0);
+            objectPresent = true;
+        } else {
+            intake.intake(output);
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
-        launcher.intake(0);
+        intake.intake(0);
     }
 
     @Override

@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -33,8 +36,12 @@ public class Arm extends SubsystemBase {
         rightMotor.setIdleMode(IdleMode.kBrake);
 
         leftMotor.getEncoder().setPositionConversionFactor(1 / (5 * 4 * 3 * 3));
-        leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition() - 0.1433); //TODO: Is this right? //0.143
-        leftMotor.getAbsoluteEncoder().setPositionConversionFactor(365);
+        leftMotor.getAbsoluteEncoder().setPositionConversionFactor(360);
+        leftMotor.getAbsoluteEncoder().setInverted(false);
+        leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition()); //TODO: Is this right? //0.143
+        // leftMotor.getAbsoluteEncoder().setPositionConversionFactor(365);
+
+        leftMotor.getPIDController().setFeedbackDevice(leftMotor.getAbsoluteEncoder());
 
         // leftMotor.setSoftLimit(SoftLimitDirection.kForward, 0); //TODO: Tune this
         // leftMotor.setSoftLimit(SoftLimitDirection.kReverse, 10); //TODO: Tune this
@@ -47,7 +54,19 @@ public class Arm extends SubsystemBase {
     }
 
     public void drive(double speed) {
-        leftMotor.set(speed);
-        rightMotor.set(-speed);
+        leftMotor.set(-speed);
+        rightMotor.set(speed);
+    }
+
+    public SparkPIDController getPIDController() {
+        return leftMotor.getPIDController();
+    }
+
+    public AbsoluteEncoder getAbsoluteEncoder() {
+        return leftMotor.getAbsoluteEncoder();
+    }
+
+    public RelativeEncoder getRelativeEncoder() {
+        return leftMotor.getEncoder();
     }
 }

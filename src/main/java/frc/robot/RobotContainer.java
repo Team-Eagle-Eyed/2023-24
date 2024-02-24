@@ -44,12 +44,15 @@ public class RobotContainer {
 
     /* Operator Buttons */
     private final JoystickButton spinUpLauncher = new JoystickButton(operator, XboxController.Button.kA.value);
+    private final JoystickButton setArmPosision = new JoystickButton(operator, XboxController.Button.kX.value);
+    private final JoystickButton reverseIntake = new JoystickButton(operator, XboxController.Button.kB.value);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Photonvision s_Photonvision = new Photonvision("changeMe");
     private final Arm s_Arm = new Arm();
-    private final Launcher s_Launcher = new Launcher();
+    private final Intake s_Intake = new Intake();
+    private final Outtake s_Outtake = new Outtake();
 
     /* Sendable Choosers */
     private final SendableChooser<String> musicSelector = new SendableChooser<>();
@@ -74,13 +77,14 @@ public class RobotContainer {
         SmartDashboard.putData("Music Selector", musicSelector);
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
-        SmartDashboard.putNumber("Launcher velocity", 1000);
+        SmartDashboard.putNumber("Launcher set velocity", 1000);
+        SmartDashboard.putNumber("arm position", 0);
 
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
-                () -> driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
-                () -> driver.getRawAxis(strafeAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
+                () -> -driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
+                () -> -driver.getRawAxis(strafeAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(rotationAxis) * 0.60 * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> robotCentric.getAsBoolean()
             )
@@ -89,14 +93,20 @@ public class RobotContainer {
         s_Arm.setDefaultCommand(
             new TeleopArm(
                 s_Arm,
-                () -> operator.getRawAxis(armAxis)
+                () -> -operator.getRawAxis(armAxis)
             )
         );
 
-        s_Launcher.setDefaultCommand(
+        s_Intake.setDefaultCommand(
             new TeleopIntake(
-                s_Launcher,
-                () -> operator.getRawAxis(intakeAxis),
+                s_Intake,
+                () -> operator.getRawAxis(intakeAxis)
+            )
+        );
+
+        s_Outtake.setDefaultCommand(
+            new TeleopOuttake(
+                s_Outtake,
                 () -> operator.getRawAxis(outtakeAxis) * SmartDashboard.getNumber("ShooterSpeed", 1)
             )
         );
@@ -116,7 +126,9 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
         centerNote.whileTrue(new CenterNote(s_Swerve, s_Photonvision));
-        spinUpLauncher.whileTrue(new SetLauncherVelocity(s_Launcher, () -> SmartDashboard.getNumber("Launcher velocity", 0)));
+        spinUpLauncher.whileTrue(new SetLauncherVelocity(s_Outtake, () -> SmartDashboard.getNumber("Launcher set velocity", 0)));
+        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25));
+        // setArmPosision.whileTrue(new SetArmPosition(s_Arm, () -> SmartDashboard.getNumber("arm position", 0)));
     }
 
     /**
