@@ -27,7 +27,13 @@ public class SetLauncherVelocity extends Command {
     @Override
     public void execute() {
         // Runs repeatedly after initialization
-        launcher.getOuttakePID().setReference(velocity.getAsDouble(), ControlType.kVelocity);
+        // Bang bang
+        if(launcher.getOuttakeEncoder().getVelocity() <= velocity.getAsDouble()) {
+            launcher.outtake(1);
+        } else if(launcher.getOuttakeEncoder().getVelocity() > velocity.getAsDouble()) {
+            launcher.outtake(0);
+        }
+        // launcher.getOuttakePID().setReference(velocity.getAsDouble(), ControlType.kVelocity);
     }
 
     @Override

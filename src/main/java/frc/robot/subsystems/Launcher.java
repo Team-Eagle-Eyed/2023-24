@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -53,8 +54,8 @@ public class Launcher extends SubsystemBase {
         // outtakeTop.set(-speed);
     }
 
-    public SparkPIDController getIntakePID() {
-        return intakeBottom.getPIDController();
+    public RelativeEncoder getOuttakeEncoder() {
+        return intakeBottom.getEncoder();
     }
 
     public SparkPIDController getOuttakePID() {
