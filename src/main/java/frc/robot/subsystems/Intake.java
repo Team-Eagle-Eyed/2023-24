@@ -6,12 +6,14 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
 
     private final CANSparkMax intakeBottom = new CANSparkMax(10, MotorType.kBrushless);
     private final CANSparkMax intakeTop = new CANSparkMax(11, MotorType.kBrushless);
+    private final DigitalInput noteSensor = new DigitalInput(0);
 
     public Intake() {
         // Runs when calling new Launcher()
@@ -47,5 +49,9 @@ public class Intake extends SubsystemBase {
 
     public SparkPIDController getIntakePID() {
         return intakeBottom.getPIDController();
+    }
+
+    public DigitalInput getNoteSensor() {
+        return noteSensor;
     }
 }

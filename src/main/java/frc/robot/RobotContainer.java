@@ -36,6 +36,7 @@ public class RobotContainer {
     private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton playMusic = new JoystickButton(driver, XboxController.Button.kA.value);
     private final JoystickButton centerNote = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton resetWheels = new JoystickButton(driver, XboxController.Button.kB.value);
 
     /* Operator Controls */
     private final int armAxis = XboxController.Axis.kLeftY.value;
@@ -49,7 +50,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
-    private final Photonvision s_Photonvision = new Photonvision("changeMe");
+    private final Photonvision s_Photonvision = new Photonvision("Microsoft_LifeCam_HD-3000");
     private final Arm s_Arm = new Arm();
     private final Intake s_Intake = new Intake();
     private final Outtake s_Outtake = new Outtake();
@@ -125,9 +126,10 @@ public class RobotContainer {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
-        centerNote.whileTrue(new CenterNote(s_Swerve, s_Photonvision));
+        centerNote.whileTrue(new CenterTarget(s_Swerve, s_Photonvision));
         spinUpLauncher.whileTrue(new SetLauncherVelocity(s_Outtake, () -> SmartDashboard.getNumber("Launcher set velocity", 0)));
         reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25));
+        resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         // setArmPosision.whileTrue(new SetArmPosition(s_Arm, () -> SmartDashboard.getNumber("arm position", 0)));
     }
 

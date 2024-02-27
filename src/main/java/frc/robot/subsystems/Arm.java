@@ -38,7 +38,7 @@ public class Arm extends SubsystemBase {
         leftMotor.getEncoder().setPositionConversionFactor(1 / (5 * 4 * 3 * 3));
         leftMotor.getAbsoluteEncoder().setPositionConversionFactor(360);
         leftMotor.getAbsoluteEncoder().setInverted(false);
-        leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition()); //TODO: Is this right? //0.143
+        //leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition()); //TODO: Is this right? //0.143
         // leftMotor.getAbsoluteEncoder().setPositionConversionFactor(365);
 
         leftMotor.getPIDController().setFeedbackDevice(leftMotor.getAbsoluteEncoder());

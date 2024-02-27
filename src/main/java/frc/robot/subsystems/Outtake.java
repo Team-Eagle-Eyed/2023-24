@@ -21,7 +21,7 @@ public class Outtake extends SubsystemBase {
     @Override
     public void periodic() {
         // Stuff to run repeatedly
-        SmartDashboard.putNumber("Launcher velocity", outtakeBottom.getEncoder().getVelocity());
+        // SmartDashboard.putNumber("Launcher velocity", outtakeBottom.getEncoder().getVelocity());
     }
 
     private void configureMotors() {

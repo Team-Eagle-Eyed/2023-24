@@ -20,7 +20,7 @@ public class TeleopIntake extends Command {
         addRequirements(intake);
         this.intake = intake;
         this.intakeSpeed = intakeSpeed;
-        noteSensor = new DigitalInput(0);
+        this.noteSensor = intake.getNoteSensor();
     }
     
     @Override

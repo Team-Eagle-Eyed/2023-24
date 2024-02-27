@@ -350,19 +350,6 @@
               "Slider Settings/Block increment": 0.0625,
               "Visuals/Display value": true
             }
-          },
-          "5,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/clock speed",
-              "_title": "/SmartDashboard/clock speed",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
           }
         }
       }
