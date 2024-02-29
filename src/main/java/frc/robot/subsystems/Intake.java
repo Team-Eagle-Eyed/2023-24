@@ -26,8 +26,8 @@ public class Intake extends SubsystemBase {
     }
 
     private void configureMotors() {
-        intakeBottom.setSmartCurrentLimit(40);
-        intakeTop.setSmartCurrentLimit(40);
+        intakeBottom.setSmartCurrentLimit(80);
+        intakeTop.setSmartCurrentLimit(80);
 
         intakeBottom.setOpenLoopRampRate(0.25);
         intakeTop.setOpenLoopRampRate(0.25);

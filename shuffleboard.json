@@ -350,6 +350,92 @@
               "Slider Settings/Block increment": 0.0625,
               "Visuals/Display value": true
             }
+          },
+          "0,0": {
+            "size": [
+              3,
+              3
+            ],
+            "content": {
+              "_type": "Camera Stream",
+              "_source0": "camera_server://photonvision_Port_1184_Output_MJPEG_Server",
+              "_title": "photonvision_Port_1184_Output_MJPEG_Server",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Crosshair/Show crosshair": true,
+              "Crosshair/Crosshair color": "#FFFFFFFF",
+              "Controls/Show controls": true,
+              "Controls/Rotation": "NONE",
+              "compression": -1.0,
+              "fps": -1,
+              "imageWidth": -1,
+              "imageHeight": -1
+            }
+          },
+          "4,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///photonvision/Microsoft_LifeCam_HD-3000/targetYaw",
+              "_title": "photonvision/Microsoft_LifeCam_HD-3000/targetYaw",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///photonvision/Microsoft_LifeCam_HD-3000/targetPitch",
+              "_title": "photonvision/Microsoft_LifeCam_HD-3000/targetPitch",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "5,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ctp",
+              "_title": "SmartDashboard/ctp",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/cti",
+              "_title": "SmartDashboard/cti",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "7,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ctd",
+              "_title": "SmartDashboard/ctd",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }

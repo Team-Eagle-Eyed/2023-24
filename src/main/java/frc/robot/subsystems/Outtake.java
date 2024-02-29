@@ -6,12 +6,12 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Outtake extends SubsystemBase {
     private final CANSparkFlex outtakeBottom = new CANSparkFlex(20, MotorType.kBrushless);
     private final CANSparkFlex outtakeTop = new CANSparkFlex(21, MotorType.kBrushless);
+    private final RelativeEncoder outtakeEncoder = outtakeBottom.getEncoder();
 
     public Outtake() {
         // Runs when calling new Launcher()
@@ -25,8 +25,8 @@ public class Outtake extends SubsystemBase {
     }
 
     private void configureMotors() {
-        outtakeBottom.setSmartCurrentLimit(40);
-        outtakeTop.setSmartCurrentLimit(40);
+        outtakeBottom.setSmartCurrentLimit(80);
+        outtakeTop.setSmartCurrentLimit(80);
 
         outtakeBottom.setOpenLoopRampRate(0.25);
         outtakeTop.setOpenLoopRampRate(0.25);
@@ -43,7 +43,11 @@ public class Outtake extends SubsystemBase {
     }
 
     public RelativeEncoder getOuttakeEncoder() {
-        return outtakeBottom.getEncoder();
+        return outtakeEncoder;
+    }
+
+    public double getVelocity() {
+        return outtakeEncoder.getVelocity();
     }
 
     public SparkPIDController getOuttakePID() {

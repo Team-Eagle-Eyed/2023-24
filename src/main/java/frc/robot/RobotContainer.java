@@ -45,7 +45,7 @@ public class RobotContainer {
 
     /* Operator Buttons */
     private final JoystickButton spinUpLauncher = new JoystickButton(operator, XboxController.Button.kA.value);
-    private final JoystickButton setArmPosision = new JoystickButton(operator, XboxController.Button.kX.value);
+    private final JoystickButton setArmPosition = new JoystickButton(operator, XboxController.Button.kX.value);
     private final JoystickButton reverseIntake = new JoystickButton(operator, XboxController.Button.kB.value);
 
     /* Subsystems */
@@ -81,6 +81,14 @@ public class RobotContainer {
         SmartDashboard.putNumber("Launcher set velocity", 1000);
         SmartDashboard.putNumber("arm position", 0);
 
+        SmartDashboard.putNumber("ctp", 0);
+        SmartDashboard.putNumber("cti", 0);
+        SmartDashboard.putNumber("ctd", 0);
+        
+        SmartDashboard.setPersistent("ctp");
+        SmartDashboard.setPersistent("cti");
+        SmartDashboard.setPersistent("ctd");
+
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
@@ -101,7 +109,8 @@ public class RobotContainer {
         s_Intake.setDefaultCommand(
             new TeleopIntake(
                 s_Intake,
-                () -> operator.getRawAxis(intakeAxis)
+                () -> operator.getRawAxis(intakeAxis) * 4000,
+                true
             )
         );
 
@@ -127,10 +136,10 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
         centerNote.whileTrue(new CenterTarget(s_Swerve, s_Photonvision));
-        spinUpLauncher.whileTrue(new SetLauncherVelocity(s_Outtake, () -> SmartDashboard.getNumber("Launcher set velocity", 0)));
-        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25));
+        spinUpLauncher.whileTrue(new TeleopLaunchNote(s_Outtake, s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 0)));
+        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false)); //-0.25
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
-        // setArmPosision.whileTrue(new SetArmPosition(s_Arm, () -> SmartDashboard.getNumber("arm position", 0)));
+        // setArmPosition.whileTrue(new SetArmPosition(s_Arm, () -> SmartDashboard.getNumber("arm position", 0)));
     }
 
     /**

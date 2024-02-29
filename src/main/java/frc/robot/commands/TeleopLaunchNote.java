@@ -5,17 +5,20 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
 
 
-public class SetLauncherVelocity extends Command {
+public class TeleopLaunchNote extends Command {
 
     private Outtake launcher;
     private DoubleSupplier velocity;
+    private Intake intake;
 
-    public SetLauncherVelocity(Outtake launcher, DoubleSupplier velocity) {
-        addRequirements(launcher);
+    public TeleopLaunchNote(Outtake launcher, Intake intake, DoubleSupplier velocity) {
+        addRequirements(launcher, intake);
         this.launcher = launcher;
+        this.intake = intake;
         this.velocity = velocity;
     }
     
@@ -32,20 +35,20 @@ public class SetLauncherVelocity extends Command {
     @Override
     public void execute() {
         // Runs repeatedly after initialization
-        // Bang bang
-        /* if(launcher.getOuttakeEncoder().getVelocity() <= velocity.getAsDouble()) {
-            launcher.outtake(1);
-        } else if(launcher.getOuttakeEncoder().getVelocity() > velocity.getAsDouble()) {
-            launcher.outtake(velocity.getAsDouble() / 7000);
-        } */
-        launcher.getOuttakePID().setReference(velocity.getAsDouble(), ControlType.kVelocity);
+        double targetVelocity = velocity.getAsDouble();
+        launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
+
+        if(launcher.getVelocity() > targetVelocity - 200 && launcher.getVelocity() < targetVelocity + 200) {
+            intake.intake(1);
+        } else {
+            intake.intake(0);
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
         launcher.getOuttakePID().setP(0);
-        // launcher.getOuttakePID().setReference(0, ControlType.kVelocity);
     }
 
     @Override
