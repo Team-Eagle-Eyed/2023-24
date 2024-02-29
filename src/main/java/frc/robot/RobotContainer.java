@@ -2,14 +2,11 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -22,31 +19,8 @@ import frc.robot.subsystems.*;
  */
 public class RobotContainer {
     /* Controllers */
-    private final Joystick driver = new Joystick(0);
-    private final Joystick operator = new Joystick(1);
-
-    /* Drive Controls */
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
-    private final int speedAxis = XboxController.Axis.kRightTrigger.value;
-
-    /* Driver Buttons */
-    private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
-    private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton playMusic = new JoystickButton(driver, XboxController.Button.kA.value);
-    private final JoystickButton centerNote = new JoystickButton(driver, XboxController.Button.kX.value);
-    private final JoystickButton resetWheels = new JoystickButton(driver, XboxController.Button.kB.value);
-
-    /* Operator Controls */
-    private final int armAxis = XboxController.Axis.kLeftY.value;
-    private final int intakeAxis = XboxController.Axis.kLeftTrigger.value;
-    private final int outtakeAxis = XboxController.Axis.kRightTrigger.value;
-
-    /* Operator Buttons */
-    private final JoystickButton spinUpLauncher = new JoystickButton(operator, XboxController.Button.kA.value);
-    private final JoystickButton setArmPosition = new JoystickButton(operator, XboxController.Button.kX.value);
-    private final JoystickButton reverseIntake = new JoystickButton(operator, XboxController.Button.kB.value);
+    private final CommandXboxController driver = new CommandXboxController(0);
+    private final CommandXboxController operator = new CommandXboxController(1);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -92,24 +66,24 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
-                () -> -driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
-                () -> -driver.getRawAxis(strafeAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
-                () -> -driver.getRawAxis(rotationAxis) * 0.60 * SmartDashboard.getNumber("SpeedLimit", 1),
-                () -> robotCentric.getAsBoolean()
+                () -> -driver.getLeftY() * driver.getRightTriggerAxis() * SmartDashboard.getNumber("SpeedLimit", 1),
+                () -> -driver.getLeftX() * driver.getRightTriggerAxis() * SmartDashboard.getNumber("SpeedLimit", 1),
+                () -> -driver.getRightX() * 0.60 * SmartDashboard.getNumber("SpeedLimit", 1),
+                () -> driver.leftBumper().getAsBoolean()
             )
         );
 
         s_Arm.setDefaultCommand(
             new TeleopArm(
                 s_Arm,
-                () -> -operator.getRawAxis(armAxis)
+                () -> -operator.getLeftY()
             )
         );
 
         s_Intake.setDefaultCommand(
             new TeleopIntake(
                 s_Intake,
-                () -> operator.getRawAxis(intakeAxis) * 4000,
+                () -> operator.getLeftTriggerAxis() * 4000,
                 true
             )
         );
@@ -117,7 +91,7 @@ public class RobotContainer {
         s_Outtake.setDefaultCommand(
             new TeleopOuttake(
                 s_Outtake,
-                () -> operator.getRawAxis(outtakeAxis) * SmartDashboard.getNumber("ShooterSpeed", 1)
+                () -> operator.getRightTriggerAxis() * SmartDashboard.getNumber("ShooterSpeed", 1)
             )
         );
 
@@ -133,12 +107,12 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-        playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
-        centerNote.whileTrue(new CenterTarget(s_Swerve, s_Photonvision));
-        spinUpLauncher.whileTrue(new TeleopLaunchNote(s_Outtake, s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 0)));
-        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false)); //-0.25
-        resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
+        driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
+        driver.a().whileTrue(new MusicPlayer(s_Swerve, musicSelector));
+        driver.x().whileTrue(new CenterTarget(s_Swerve, s_Photonvision));
+        operator.a().whileTrue(new TeleopLaunchNote(s_Outtake, s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 0)));
+        operator.b().whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false)); //-0.25
+        driver.b().onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         // setArmPosition.whileTrue(new SetArmPosition(s_Arm, () -> SmartDashboard.getNumber("arm position", 0)));
     }
 
