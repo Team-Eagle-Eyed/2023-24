@@ -46,6 +46,7 @@ public class TeleopLaunchNote extends Command {
         launcher.getOuttakePID().setOutputRange(0, 1);
 
         turnController.setTolerance(1);
+        turnController.setSetpoint(0);
     }
 
     @Override
