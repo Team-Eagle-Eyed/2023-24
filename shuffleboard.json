@@ -351,6 +351,19 @@
               "Visuals/Display value": true
             }
           },
+          "5,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/rangeToTarget",
+              "_title": "SmartDashboard/rangeToTarget",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
           "0,0": {
             "size": [
               3,
@@ -358,8 +371,8 @@
             ],
             "content": {
               "_type": "Camera Stream",
-              "_source0": "camera_server://photonvision_Port_1184_Output_MJPEG_Server",
-              "_title": "photonvision_Port_1184_Output_MJPEG_Server",
+              "_source0": "camera_server://photonvision_Port_1182_Output_MJPEG_Server",
+              "_title": "photonvision_Port_1182_Output_MJPEG_Server",
               "_glyph": 148,
               "_showGlyph": false,
               "Crosshair/Show crosshair": true,
@@ -372,56 +385,19 @@
               "imageHeight": -1
             }
           },
-          "4,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///photonvision/Microsoft_LifeCam_HD-3000/targetYaw",
-              "_title": "photonvision/Microsoft_LifeCam_HD-3000/targetYaw",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "3,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///photonvision/Microsoft_LifeCam_HD-3000/targetPitch",
-              "_title": "photonvision/Microsoft_LifeCam_HD-3000/targetPitch",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "5,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ctp",
-              "_title": "SmartDashboard/ctp",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "6,1": {
             "size": [
               1,
               1
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/cti",
-              "_title": "SmartDashboard/cti",
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/atSetpoint",
+              "_title": "SmartDashboard/atSetpoint",
               "_glyph": 148,
-              "_showGlyph": false
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           },
           "7,1": {
@@ -430,9 +406,65 @@
               1
             ],
             "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/launcherAtSpeed",
+              "_title": "SmartDashboard/launcherAtSpeed",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "6,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/validTarget",
+              "_title": "SmartDashboard/validTarget",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "5,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ctd",
-              "_title": "SmartDashboard/ctd",
+              "_source0": "network_table:///SmartDashboard/ANGULAR_P",
+              "_title": "SmartDashboard/ANGULAR_P",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ANGULAR_I",
+              "_title": "SmartDashboard/ANGULAR_I",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "7,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ANGULAR_D",
+              "_title": "SmartDashboard/ANGULAR_D",
               "_glyph": 148,
               "_showGlyph": false
             }

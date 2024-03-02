@@ -2,9 +2,9 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import com.revrobotics.CANSparkBase.ControlType;
-
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 
@@ -13,38 +13,38 @@ public class SetArmPosition extends Command {
 
     private Arm arm;
     private DoubleSupplier position;
+    private PIDController positionController;
 
     public SetArmPosition(Arm arm, DoubleSupplier position) {
         addRequirements(arm);
         this.arm = arm;
         this.position = position;
+        positionController = new PIDController(0.03, 0.0005, 0);
     }
     
     @Override
     public void initialize() {
         // Runs once on start
-        arm.getPIDController().setP(0.0002);
-        arm.getPIDController().setI(0);
-        arm.getPIDController().setD(0);
-        arm.getPIDController().setOutputRange(0, 1);
+        positionController.setSetpoint(position.getAsDouble());
+        positionController.setTolerance(1);
     }
     
     @Override
     public void execute() {
-        arm.getPIDController().setFF(Math.cos(Units.degreesToRadians(arm.getAbsoluteEncoder().getPosition() - 180)) * 0.015);
-        arm.getPIDController().setReference(position.getAsDouble(), ControlType.kVelocity);
+        arm.drive(MathUtil.clamp(positionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
+        SmartDashboard.putBoolean("armAtSetpoint", positionController.atSetpoint());
     }
 
     @Override
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
-        arm.getPIDController().setP(0);
+        positionController.setP(0);
         // arm.getPIDController().setReference(0, ControlType.kVelocity);
     }
 
     @Override
     public boolean isFinished() {
-        return false;
         // Whether or not the command is finished
+        return positionController.atSetpoint();
     }
 }

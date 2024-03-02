@@ -25,7 +25,7 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Left Arm Motor", leftMotor.get());
         SmartDashboard.putNumber("Right Arm Motor", rightMotor.get());
         SmartDashboard.putNumber("Left Motor position", leftMotor.getEncoder().getPosition());
-        SmartDashboard.putNumber("Left Motor absolute position", leftMotor.getAbsoluteEncoder().getPosition());
+        SmartDashboard.putNumber("Left Motor absolute position", getAbsoluteAdjustedPosition());
     }
 
     private void configureMotors() {
@@ -37,7 +37,7 @@ public class Arm extends SubsystemBase {
 
         leftMotor.getEncoder().setPositionConversionFactor(1 / (5 * 4 * 3 * 3));
         leftMotor.getAbsoluteEncoder().setPositionConversionFactor(360);
-        leftMotor.getAbsoluteEncoder().setInverted(false);
+        leftMotor.getAbsoluteEncoder().setInverted(true);
         //leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition()); //TODO: Is this right? //0.143
         // leftMotor.getAbsoluteEncoder().setPositionConversionFactor(365);
 
@@ -68,5 +68,9 @@ public class Arm extends SubsystemBase {
 
     public RelativeEncoder getRelativeEncoder() {
         return leftMotor.getEncoder();
+    }
+
+    public Double getAbsoluteAdjustedPosition() {
+        return leftMotor.getAbsoluteEncoder().getPosition() - 97;
     }
 }

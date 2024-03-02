@@ -6,6 +6,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Outtake extends SubsystemBase {
@@ -21,7 +22,7 @@ public class Outtake extends SubsystemBase {
     @Override
     public void periodic() {
         // Stuff to run repeatedly
-        // SmartDashboard.putNumber("Launcher velocity", outtakeBottom.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Launcher velocity", getVelocity());
     }
 
     private void configureMotors() {

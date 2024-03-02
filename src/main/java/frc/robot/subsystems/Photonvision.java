@@ -12,22 +12,23 @@ public class Photonvision extends SubsystemBase {
 
     PhotonCamera camera;
 
-    private double CAMERA_HEIGHT_METERS = Units.inchesToMeters(24);
-    private double TARGET_HEIGHT_METERS = 1.45;
+    private double CAMERA_HEIGHT_METERS;
+    private double TARGET_HEIGHT_METERS;
 
     // Angle between horizontal and the camera.
-    private double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
+    private double CAMERA_PITCH_RADIANS;
 
-    public Photonvision(String cameraID, double CAMERA_HEIGHT_METERS, double TARGET_HEIGHT_METERS, double CAMERA_PITCH_RADIANS) {
+    public Photonvision(String cameraID, double CAMERA_HEIGHT_INCHES, double TARGET_HEIGHT_METERS, double CAMERA_PITCH_DEGREES) {
         this.camera = new PhotonCamera(cameraID);
-        this.CAMERA_HEIGHT_METERS = CAMERA_HEIGHT_METERS;
+        this.CAMERA_HEIGHT_METERS = Units.inchesToMeters(CAMERA_HEIGHT_INCHES);
         this.TARGET_HEIGHT_METERS = TARGET_HEIGHT_METERS;
-        this.CAMERA_PITCH_RADIANS = CAMERA_PITCH_RADIANS;
+        this.CAMERA_PITCH_RADIANS = Units.degreesToRadians(CAMERA_PITCH_DEGREES);
     }
 
     @Override
     public void periodic(){
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
+        SmartDashboard.putNumber("rangeToTarget", getTargetRange());
     }
 
     public PhotonPipelineResult getLatestResult() {

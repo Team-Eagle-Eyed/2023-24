@@ -35,7 +35,6 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton playMusic = new JoystickButton(driver, XboxController.Button.kA.value);
-    private final JoystickButton centerNote = new JoystickButton(driver, XboxController.Button.kX.value);
     private final JoystickButton resetWheels = new JoystickButton(driver, XboxController.Button.kB.value);
 
     /* Operator Controls */
@@ -51,10 +50,10 @@ public class RobotContainer {
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Photonvision s_Photonvision = new Photonvision(
-                                                    "Microsoft_LifeCam_HD-3000",
-                                                    24,
+                                                    "Apriltag Camera",
+                                                    27.76,
                                                     1.45,
-                                                    0
+                                                    16
                                                     );
     private final Arm s_Arm = new Arm();
     private final Intake s_Intake = new Intake();
@@ -83,16 +82,11 @@ public class RobotContainer {
         SmartDashboard.putData("Music Selector", musicSelector);
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
-        SmartDashboard.putNumber("Launcher set velocity", 1000);
-        SmartDashboard.putNumber("arm position", 0);
+        SmartDashboard.putNumber("Launcher set velocity", 4500);
 
-        SmartDashboard.putNumber("ctp", 0);
-        SmartDashboard.putNumber("cti", 0);
-        SmartDashboard.putNumber("ctd", 0);
-        
-        SmartDashboard.setPersistent("ctp");
-        SmartDashboard.setPersistent("cti");
-        SmartDashboard.setPersistent("ctd");
+        SmartDashboard.putNumber("armP", 0);
+        SmartDashboard.putNumber("armI", 0);
+        SmartDashboard.putNumber("armD", 0);
 
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
@@ -140,18 +134,18 @@ public class RobotContainer {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
-        centerNote.whileTrue(new CenterTarget(s_Swerve, s_Photonvision));
         launchNote.whileTrue(new TeleopLaunchNote(
                                     s_Swerve,
+                                    s_Arm,
                                     s_Outtake,
                                     s_Intake,
                                     s_Photonvision,
                                     () -> SmartDashboard.getNumber("Launcher set velocity", 0)
                                     )
                                 );
-        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false)); //-0.25
+        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
-        // setArmPosition.whileTrue(new SetArmPosition(s_Arm, () -> SmartDashboard.getNumber("arm position", 0)));
+        setArmPosition.whileTrue(new SetArmPosition(s_Arm, () -> 90));
     }
 
     /**
