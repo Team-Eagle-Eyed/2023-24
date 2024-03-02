@@ -57,7 +57,7 @@ public class TeleopLaunchNote extends Command {
 
         PhotonPipelineResult result = photonvision.getLatestResult();
         double rotationSpeed;
-        if(result.hasTargets()) {
+        if(result.hasTargets() && !turnController.atSetpoint()) { //if there is a target, and you aren't already within the tolerance continue
             rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
             //TODO: Find the correct ID number
         } else {
