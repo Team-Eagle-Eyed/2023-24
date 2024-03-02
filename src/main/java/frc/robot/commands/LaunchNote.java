@@ -8,6 +8,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.revrobotics.CANSparkBase.ControlType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -20,7 +21,7 @@ import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.Photonvision;
 
 
-public class TeleopLaunchNote extends Command {
+public class LaunchNote extends Command {
 
     private Outtake launcher;
     private DoubleSupplier velocity;
@@ -32,55 +33,67 @@ public class TeleopLaunchNote extends Command {
     private double ANGULAR_P = 0.15;
     private double ANGULAR_I = 0.3;
     private double ANGULAR_D = 0;
+
+    private double ARM_P = 0.03;
+    private double ARM_I = 0.0005;
+    private double ARM_D = 0;
+
     private PIDController turnController;
+    private PIDController armPositionController;
 
-    private Command setArmPosition;
-
-    public TeleopLaunchNote(Swerve swerve, Arm arm, Outtake launcher, Intake intake, Photonvision photonvision, DoubleSupplier velocity) {
-        addRequirements(swerve, launcher, intake, photonvision);
+    public LaunchNote(Swerve swerve, Arm arm, Outtake launcher, Intake intake, Photonvision photonvision, DoubleSupplier velocity) {
+        addRequirements(swerve, arm, launcher, intake, photonvision);
         this.swerve = swerve;
         this.arm = arm;
         this.launcher = launcher;
         this.intake = intake;
         this.photonvision = photonvision;
         this.velocity = velocity;
+
+        /*
+         * Create PID controllers for the arm and rotation
+         */
+        armPositionController = new PIDController(ARM_P, ARM_I, ARM_D);
+        turnController = new PIDController(ANGULAR_P, ANGULAR_I, ANGULAR_D);
     }
     
     @Override
     public void initialize() {
         // Runs once on start
-
-        PIDController turnController = new PIDController(ANGULAR_P, ANGULAR_I, ANGULAR_D);
-        this.turnController = turnController;
-
     
+        /*
+         * Closed loop PID for launcher
+         */
         launcher.getOuttakePID().setP(0.0002);
         launcher.getOuttakePID().setI(0);
         launcher.getOuttakePID().setD(0);
         launcher.getOuttakePID().setFF(0.000175);
         launcher.getOuttakePID().setOutputRange(0, 1);
 
+
+        /*
+         * Configure arm and rotation PID controllers
+         */
         turnController.setTolerance(1);
         turnController.setSetpoint(2.15);
 
-        setArmPosition = new SetArmPosition(
-            arm,
-            () -> Units.radiansToDegrees(Math.atan(1.45 / photonvision.getTargetRange()))
-        );
+        armPositionController.setTolerance(1);
+        armPositionController.setSetpoint(Units.radiansToDegrees(Math.atan(1.45 / photonvision.getTargetRange())));
 
     }
 
     @Override
     public void execute() {
         // Runs repeatedly after initialization
-        double targetVelocity = velocity.getAsDouble();
+        double targetVelocity = velocity.getAsDouble(); // Get velocity
 
-        launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
+        PhotonPipelineResult result = photonvision.getLatestResult(); // Get latest result from photonvision
+        double rotationSpeed = 0; // Define rotationSpeed as a default of 0
+        boolean validTarget = false; // Define validTarget as a default of false
 
-        PhotonPipelineResult result = photonvision.getLatestResult();
-        double rotationSpeed = 0;
-        boolean validTarget = false;
-
+        /*
+         * Logic for choosing an apriltag to use
+         */
         if(result.hasTargets()) { // if a target is acquired
             PhotonTrackedTarget target = result.getBestTarget(); // get best target
             List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
@@ -97,6 +110,9 @@ public class TeleopLaunchNote extends Command {
                 validTarget = false; // mark as having no valid target
             }
 
+            /*
+             * Calculating the rotation output
+             */
             if (validTarget/*  && !turnController.atSetpoint() */) { // if we have a valid target and the PID controller for rotation isn't already within the tolerance
                 rotationSpeed = turnController.calculate(target.getYaw()); // set the rotation speed based on the PID calculations
             } else { // otherwise
@@ -107,6 +123,11 @@ public class TeleopLaunchNote extends Command {
             rotationSpeed = 0; // don't rotate
         }
 
+
+
+        /*
+         * Outputs
+         */
         swerve.drive( // drive with the rotationSpeed from the if statements and PID controllers above
             new Translation2d(),
             rotationSpeed,
@@ -114,18 +135,30 @@ public class TeleopLaunchNote extends Command {
             true
             );
 
+        arm.drive(MathUtil.clamp(armPositionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
+
+        launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
+
+
+        /*
+         * Checking conditions before launch
+         */
         boolean launcherAtSpeed = launcher.getVelocity() > targetVelocity - 200;
 
-        if(launcherAtSpeed && turnController.atSetpoint() && setArmPosition.isFinished()) { // if the launcher is within the tolerance of the specified RPMs and our target is within the tolerance
+        if(launcherAtSpeed && turnController.atSetpoint() && armPositionController.atSetpoint()) { // if the launcher is within the tolerance of the specified RPMs and our target is within the tolerance
             intake.intake(1); // run the intake to push it into the launcher
         } else { // otherwise
             intake.intake(0); // don't run the intake
         }
 
 
+        /*
+         * Put checks to dashboard
+         */
         SmartDashboard.putBoolean("validTarget", validTarget);
         SmartDashboard.putBoolean("launcherAtSpeed", launcherAtSpeed);
-        SmartDashboard.putBoolean("atSetpoint", turnController.atSetpoint());
+        SmartDashboard.putBoolean("rotationAtSetpoint", turnController.atSetpoint());
+        SmartDashboard.putBoolean("armAtSetpoint", armPositionController.atSetpoint());
     }
 
     @Override

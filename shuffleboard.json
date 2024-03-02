@@ -392,8 +392,8 @@
             ],
             "content": {
               "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/atSetpoint",
-              "_title": "SmartDashboard/atSetpoint",
+              "_source0": "network_table:///SmartDashboard/armAtSetpoint",
+              "_title": "SmartDashboard/armAtSetpoint",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",

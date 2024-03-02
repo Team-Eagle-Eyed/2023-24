@@ -134,7 +134,7 @@ public class RobotContainer {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
-        launchNote.whileTrue(new TeleopLaunchNote(
+        launchNote.whileTrue(new LaunchNote(
                                     s_Swerve,
                                     s_Arm,
                                     s_Outtake,
