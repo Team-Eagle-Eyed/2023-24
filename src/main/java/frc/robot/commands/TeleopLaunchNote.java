@@ -1,8 +1,10 @@
 package frc.robot.commands;
 
+import java.util.List;
 import java.util.function.DoubleSupplier;
 
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.revrobotics.CANSparkBase.ControlType;
 
@@ -56,15 +58,33 @@ public class TeleopLaunchNote extends Command {
         launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
 
         PhotonPipelineResult result = photonvision.getLatestResult();
-        double rotationSpeed;
-        if(result.hasTargets() && !turnController.atSetpoint()) { //if there is a target, and you aren't already within the tolerance continue
-            rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
-            //TODO: Find the correct ID number
-        } else {
-            rotationSpeed = 0;
+        double rotationSpeed = 0;
+        boolean validTarget = false;
+
+        if(result.hasTargets()) { // if a target is acquired
+            PhotonTrackedTarget target = result.getBestTarget(); // get best target
+            List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
+            
+            if(targets.get(0).getFiducialId() == 4 || targets.get(0).getFiducialId() == 7) { // if the first target is 4 or 7, 
+                target = targets.get(0); // set the target to use as the first target
+                validTarget = true; // and mark as having a valid target
+            } else if (targets.get(1).getFiducialId() == 4 || targets.get(1).getFiducialId() == 7) { // otherwise if the second target is 4 or 7 (assuming the camera will only see the two targets at the same time)
+                target = targets.get(1); // set the target to use as the second target
+                validTarget = true; // and mark as having a valid target
+            } else { // otherwise
+                validTarget = false; // mark as having no valid target
+            }
+
+            if (validTarget && !turnController.atSetpoint()) { // if we have a valid target and the PID controller for rotation isn't already within the tolerance
+                rotationSpeed = -turnController.calculate(target.getYaw(), 0); // set the rotation speed based on the PID calculations
+            } else { // otherwise
+                rotationSpeed = 0; // don't rotate
+            }
+        } else { // if no target acquired
+            rotationSpeed = 0; // don't rotate
         }
 
-        swerve.drive(
+        swerve.drive( // drive with the rotationSpeed from the if statements and PID controllers above
             new Translation2d(),
             rotationSpeed,
             false,
@@ -74,17 +94,17 @@ public class TeleopLaunchNote extends Command {
         boolean launcherAtSpeed = launcher.getVelocity() > targetVelocity - 200 && launcher.getVelocity() < targetVelocity + 200;
         boolean targetCentered = turnController.atSetpoint();
 
-        if(launcherAtSpeed && targetCentered) {
-            intake.intake(1);
-        } else {
-            intake.intake(0);
+        if(launcherAtSpeed && targetCentered) { // if the launcher is within the tolerance of the specified RPMs and our target is within the tolerance
+            intake.intake(1); // run the intake to push it into the launcher
+        } else { // otherwise
+            intake.intake(0); // don't run the intake
         }
     }
 
     @Override
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
-        launcher.getOuttakePID().setP(0);
+        launcher.getOuttakePID().setP(0); // set p to 0 as to not brake the motor
     }
 
     @Override
