@@ -385,21 +385,6 @@
               "imageHeight": -1
             }
           },
-          "6,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/armAtSetpoint",
-              "_title": "SmartDashboard/armAtSetpoint",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
           "7,1": {
             "size": [
               1,
@@ -430,43 +415,34 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "5,2": {
+          "7,0": {
             "size": [
               1,
               1
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ANGULAR_P",
-              "_title": "SmartDashboard/ANGULAR_P",
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/rotationAtSetpoint",
+              "_title": "/SmartDashboard/rotationAtSetpoint",
               "_glyph": 148,
-              "_showGlyph": false
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           },
-          "6,2": {
+          "6,1": {
             "size": [
               1,
               1
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ANGULAR_I",
-              "_title": "SmartDashboard/ANGULAR_I",
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/armAtSetpoint",
+              "_title": "/SmartDashboard/armAtSetpoint",
               "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "7,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ANGULAR_D",
-              "_title": "SmartDashboard/ANGULAR_D",
-              "_glyph": 148,
-              "_showGlyph": false
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           }
         }

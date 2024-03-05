@@ -109,12 +109,13 @@ public class LaunchNote extends Command {
                 turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
 
                 double armSetpoint = MathUtil.clamp(
-                                Units.radiansToDegrees(Math.atan(1.45 / photonvision.getSpecificTargetRange(target))),
-                                18,
+                                Units.radiansToDegrees(Math.atan(Units.inchesToMeters(85) / photonvision.getSpecificTargetRange(target))),
+                                31.5,
                                 90);
                 armPositionController.setSetpoint(armSetpoint);
             } else {
                 turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
+
             }
 
         } else { // if no target acquired
@@ -147,7 +148,15 @@ public class LaunchNote extends Command {
             true
             );
 
-        arm.drive(MathUtil.clamp(armPositionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
+        if(validTarget) {
+            if(!armPositionController.atSetpoint()) { // if we arent at the arm setpoint
+                arm.drive( // move the arm to it
+                    MathUtil.clamp(armPositionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
+            } else { // otherwise feedforward to stop the arm from drooping
+                arm.drive(Math.cos(Units.degreesToRadians(arm.getAbsoluteEncoder().getPosition() - 180)) * 0.015);
+                armPositionController.calculate(arm.getAbsoluteAdjustedPosition());
+            }
+        }
 
         double targetVelocity = velocity.getAsDouble(); // Get velocity
         launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
@@ -164,7 +173,7 @@ public class LaunchNote extends Command {
          * 2. The turncontroller is within the tolerance for facing the target, OR we didn't have a valid target to turn to
          * 3. The arm is at the correct angle
          */
-        if(launcherAtSpeed && (turnController.atSetpoint() || validTarget == false) && armPositionController.atSetpoint()) {
+        if(launcherAtSpeed && (turnController.atSetpoint() || validTarget == false) && (armPositionController.atSetpoint() || validTarget == false)) {
             intake.intake(1); // run the intake to push it into the launcher
         } else { // otherwise
             intake.intake(0); // don't run the intake
