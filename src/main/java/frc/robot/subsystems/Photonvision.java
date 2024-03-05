@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,5 +48,14 @@ public class Photonvision extends SubsystemBase {
         } else {
             return 0;
         }
+    }
+
+    public double getSpecificTargetRange(PhotonTrackedTarget target) {
+        double range = PhotonUtils.calculateDistanceToTargetMeters(
+            CAMERA_HEIGHT_METERS,
+            TARGET_HEIGHT_METERS,
+            CAMERA_PITCH_RADIANS,
+            Units.degreesToRadians(target.getPitch()));
+        return range;
     }
 }

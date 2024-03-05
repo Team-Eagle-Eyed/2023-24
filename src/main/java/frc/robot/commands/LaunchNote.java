@@ -41,6 +41,9 @@ public class LaunchNote extends Command {
     private PIDController turnController;
     private PIDController armPositionController;
 
+    private double rotationSpeed = 0; // Define rotationSpeed as a default of 0
+    boolean validTarget = false; // Define validTarget as a default of false
+
     public LaunchNote(Swerve swerve, Arm arm, Outtake launcher, Intake intake, Photonvision photonvision, DoubleSupplier velocity) {
         addRequirements(swerve, arm, launcher, intake, photonvision);
         this.swerve = swerve;
@@ -70,30 +73,19 @@ public class LaunchNote extends Command {
         launcher.getOuttakePID().setFF(0.000175);
         launcher.getOuttakePID().setOutputRange(0, 1);
 
-
+        
         /*
-         * Configure arm and rotation PID controllers
-         */
+        * Configure arm and rotation PID controllers
+        */
         turnController.setTolerance(1);
-        turnController.setSetpoint(2.15);
-
+        
         armPositionController.setTolerance(1);
-        armPositionController.setSetpoint(Units.radiansToDegrees(Math.atan(1.45 / photonvision.getTargetRange())));
-
-    }
-
-    @Override
-    public void execute() {
-        // Runs repeatedly after initialization
-        double targetVelocity = velocity.getAsDouble(); // Get velocity
-
-        PhotonPipelineResult result = photonvision.getLatestResult(); // Get latest result from photonvision
-        double rotationSpeed = 0; // Define rotationSpeed as a default of 0
-        boolean validTarget = false; // Define validTarget as a default of false
-
+        
+        
         /*
-         * Logic for choosing an apriltag to use
-         */
+        * Logic for choosing an apriltag to use
+        */
+        PhotonPipelineResult result = photonvision.getLatestResult(); // Get latest result from photonvision
         if(result.hasTargets()) { // if a target is acquired
             PhotonTrackedTarget target = result.getBestTarget(); // get best target
             List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
@@ -111,19 +103,39 @@ public class LaunchNote extends Command {
             }
 
             /*
-             * Calculating the rotation output
+             * Configure the turning PID based on the target and gyroscope, plus an offset.
              */
-            if (validTarget/*  && !turnController.atSetpoint() */) { // if we have a valid target and the PID controller for rotation isn't already within the tolerance
-                rotationSpeed = turnController.calculate(target.getYaw()); // set the rotation speed based on the PID calculations
-            } else { // otherwise
-                turnController.calculate(target.getYaw());
-                rotationSpeed = 0; // don't rotate
+            if(validTarget) {
+                turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
+
+                double armSetpoint = MathUtil.clamp(
+                                Units.radiansToDegrees(Math.atan(1.45 / photonvision.getSpecificTargetRange(target))),
+                                18,
+                                90);
+                armPositionController.setSetpoint(armSetpoint);
+            } else {
+                turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
             }
+
         } else { // if no target acquired
-            rotationSpeed = 0; // don't rotate
+            validTarget = false;
+            turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
         }
 
+    }
 
+    @Override
+    public void execute() {
+        // Runs repeatedly after initialization
+
+        /*
+         * Calculating the rotation output
+         */
+        if (validTarget/*  && !turnController.atSetpoint() */) { // if we have a valid target and the PID controller for rotation isn't already within the tolerance
+            rotationSpeed = turnController.calculate(swerve.getGyroYaw().getDegrees()); // set the rotation speed based on the PID calculations
+        } else { // otherwise
+            rotationSpeed = 0; // don't rotate
+        }
 
         /*
          * Outputs
@@ -137,6 +149,7 @@ public class LaunchNote extends Command {
 
         arm.drive(MathUtil.clamp(armPositionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
 
+        double targetVelocity = velocity.getAsDouble(); // Get velocity
         launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
 
 
@@ -145,7 +158,13 @@ public class LaunchNote extends Command {
          */
         boolean launcherAtSpeed = launcher.getVelocity() > targetVelocity - 200;
 
-        if(launcherAtSpeed && turnController.atSetpoint() && armPositionController.atSetpoint()) { // if the launcher is within the tolerance of the specified RPMs and our target is within the tolerance
+        /*
+         * Checking if we can launch
+         * 1. Launcher is within the speed tolerance (greater than 200 less than the setpoint)
+         * 2. The turncontroller is within the tolerance for facing the target, OR we didn't have a valid target to turn to
+         * 3. The arm is at the correct angle
+         */
+        if(launcherAtSpeed && (turnController.atSetpoint() || validTarget == false) && armPositionController.atSetpoint()) {
             intake.intake(1); // run the intake to push it into the launcher
         } else { // otherwise
             intake.intake(0); // don't run the intake
