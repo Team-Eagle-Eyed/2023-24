@@ -12,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
@@ -44,6 +45,8 @@ public class LaunchNote extends Command {
     private double rotationSpeed = 0; // Define rotationSpeed as a default of 0
     boolean validTarget = false; // Define validTarget as a default of false
 
+    private Timer finishedTimer = new Timer();
+
     public LaunchNote(Swerve swerve, Arm arm, Outtake launcher, Intake intake, Photonvision photonvision, DoubleSupplier velocity) {
         addRequirements(swerve, arm, launcher, intake, photonvision);
         this.swerve = swerve;
@@ -62,6 +65,7 @@ public class LaunchNote extends Command {
     
     @Override
     public void initialize() {
+        finishedTimer.start();
         // Runs once on start
     
         /*
@@ -109,7 +113,7 @@ public class LaunchNote extends Command {
                 turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
 
                 double armSetpoint = MathUtil.clamp(
-                                Units.radiansToDegrees(Math.atan(Units.inchesToMeters(85) / photonvision.getSpecificTargetRange(target))),
+                                Units.radiansToDegrees(Math.atan(Units.inchesToMeters(95) / photonvision.getSpecificTargetRange(target))), // 85 inches
                                 31.5,
                                 90);
                 armPositionController.setSetpoint(armSetpoint);
@@ -177,6 +181,7 @@ public class LaunchNote extends Command {
             intake.intake(1); // run the intake to push it into the launcher
         } else { // otherwise
             intake.intake(0); // don't run the intake
+            finishedTimer.restart();
         }
 
 
@@ -193,11 +198,17 @@ public class LaunchNote extends Command {
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
         launcher.getOuttakePID().setP(0); // set p to 0 as to not brake the motor
+        intake.intake(0);
+        finishedTimer.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        if(finishedTimer.get() > 1) {
+            return true;
+        } else {
+            return false;
+        }
         // Whether or not the command is finished
     }
 }

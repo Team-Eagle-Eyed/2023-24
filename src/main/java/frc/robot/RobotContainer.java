@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -53,7 +54,7 @@ public class RobotContainer {
                                                     "Apriltag Camera",
                                                     27.76,
                                                     1.45,
-                                                    16
+                                                    20
                                                     );
     private final Arm s_Arm = new Arm();
     private final Intake s_Intake = new Intake();
@@ -67,6 +68,8 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+
+        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_Photonvision, () -> 4500));
 
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");
