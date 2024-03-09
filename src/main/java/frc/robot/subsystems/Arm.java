@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,7 +36,6 @@ public class Arm extends SubsystemBase {
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
 
-        leftMotor.getEncoder().setPositionConversionFactor(1 / (5 * 4 * 3 * 3));
         leftMotor.getAbsoluteEncoder().setPositionConversionFactor(360);
         leftMotor.getAbsoluteEncoder().setInverted(true);
         //leftMotor.getEncoder().setPosition(leftMotor.getAbsoluteEncoder().getPosition()); //TODO: Is this right? //0.143
@@ -43,11 +43,14 @@ public class Arm extends SubsystemBase {
 
         leftMotor.getPIDController().setFeedbackDevice(leftMotor.getAbsoluteEncoder());
 
-        // leftMotor.setSoftLimit(SoftLimitDirection.kForward, 0); //TODO: Tune this
-        // leftMotor.setSoftLimit(SoftLimitDirection.kReverse, 10); //TODO: Tune this
+        leftMotor.setSoftLimit(SoftLimitDirection.kForward, 0); //TODO: Tune this
+        leftMotor.setSoftLimit(SoftLimitDirection.kReverse, -80); //TODO: Tune this
 
-        leftMotor.setSmartCurrentLimit(10);
-        rightMotor.setSmartCurrentLimit(10);
+        rightMotor.setSoftLimit(SoftLimitDirection.kForward, 80); //TODO: Tune this
+        rightMotor.setSoftLimit(SoftLimitDirection.kReverse, 0); //TODO: Tune this
+
+        leftMotor.setSmartCurrentLimit(50);
+        rightMotor.setSmartCurrentLimit(50);
 
         leftMotor.burnFlash();
         rightMotor.burnFlash();
@@ -71,6 +74,6 @@ public class Arm extends SubsystemBase {
     }
 
     public Double getAbsoluteAdjustedPosition() {
-        return leftMotor.getAbsoluteEncoder().getPosition() - 97;
+        return leftMotor.getAbsoluteEncoder().getPosition() - 106;
     }
 }

@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
@@ -14,15 +15,22 @@ public class Intake extends SubsystemBase {
     private final CANSparkMax intakeBottom = new CANSparkMax(10, MotorType.kBrushless);
     private final CANSparkMax intakeTop = new CANSparkMax(11, MotorType.kBrushless);
     private final DigitalInput noteSensor = new DigitalInput(0);
+    private final PowerDistribution pdh = new PowerDistribution();
 
     public Intake() {
         // Runs when calling new Launcher()
         configureMotors();
+        pdh.setSwitchableChannel(true);
     }
 
     @Override
     public void periodic() {
         // Stuff to run repeatedly
+        if(!getNoteSensor().get()) {
+            pdh.setSwitchableChannel(true);
+        } else {
+            pdh.setSwitchableChannel(false);
+        }
     }
 
     private void configureMotors() {

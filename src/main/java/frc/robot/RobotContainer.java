@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,13 +49,15 @@ public class RobotContainer {
     private final JoystickButton setArmPosition = new JoystickButton(operator, XboxController.Button.kX.value);
     private final JoystickButton reverseIntake = new JoystickButton(operator, XboxController.Button.kB.value);
 
+    private final JoystickButton rumbleTemp = new JoystickButton(operator, XboxController.Button.kY.value);
+
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Photonvision s_Photonvision = new Photonvision(
                                                     "Apriltag Camera",
-                                                    27.76,
+                                                    27.25,
                                                     1.45,
-                                                    20
+                                                    21
                                                     );
     private final Arm s_Arm = new Arm();
     private final Intake s_Intake = new Intake();
@@ -70,6 +73,7 @@ public class RobotContainer {
     public RobotContainer() {
 
         NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_Photonvision, () -> 4500));
+        NamedCommands.registerCommand("startIntake", new TeleopIntake(s_Intake, () -> 4000, true));
 
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");
@@ -147,8 +151,11 @@ public class RobotContainer {
                                     )
                                 );
         reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false));
+        reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, () -> -0.25));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         setArmPosition.whileTrue(new SetArmPosition(s_Arm, () -> 90));
+        rumbleTemp.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 1)));
+        rumbleTemp.onFalse(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
     }
 
     /**

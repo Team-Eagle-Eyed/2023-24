@@ -113,8 +113,8 @@ public class LaunchNote extends Command {
                 turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
 
                 double armSetpoint = MathUtil.clamp(
-                                Units.radiansToDegrees(Math.atan(Units.inchesToMeters(95) / photonvision.getSpecificTargetRange(target))), // 85 inches
-                                31.5,
+                                Units.radiansToDegrees(Math.atan(Units.inchesToMeters(80) / photonvision.getSpecificTargetRange(target))), // 85 inches
+                                23,
                                 90);
                 armPositionController.setSetpoint(armSetpoint);
             } else {
@@ -163,7 +163,9 @@ public class LaunchNote extends Command {
         }
 
         double targetVelocity = velocity.getAsDouble(); // Get velocity
-        launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
+        if(validTarget) {
+            launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
+        }
 
 
         /*
@@ -177,7 +179,7 @@ public class LaunchNote extends Command {
          * 2. The turncontroller is within the tolerance for facing the target, OR we didn't have a valid target to turn to
          * 3. The arm is at the correct angle
          */
-        if(launcherAtSpeed && (turnController.atSetpoint() || validTarget == false) && (armPositionController.atSetpoint() || validTarget == false)) {
+        if(launcherAtSpeed && turnController.atSetpoint() && armPositionController.atSetpoint() && validTarget == true) {
             intake.intake(1); // run the intake to push it into the launcher
         } else { // otherwise
             intake.intake(0); // don't run the intake
