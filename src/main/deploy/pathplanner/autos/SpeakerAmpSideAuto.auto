@@ -1,26 +1,20 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 1.408601513944883,
-      "y": 5.596312345506897
-    },
-    "rotation": 0
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "launchNote"
+            "pathName": "SpeakerAmpSidePath"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "TestPath"
+            "name": "launchNote"
           }
         },
         {

@@ -153,13 +153,16 @@ public class LaunchNote extends Command {
             );
 
         if(validTarget) {
-            if(!armPositionController.atSetpoint()) { // if we arent at the arm setpoint
+            arm.drive( // move the arm to it
+                    MathUtil.clamp(armPositionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
+
+            /* if(!armPositionController.atSetpoint()) { // if we arent at the arm setpoint
                 arm.drive( // move the arm to it
                     MathUtil.clamp(armPositionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
             } else { // otherwise feedforward to stop the arm from drooping
                 arm.drive(Math.cos(Units.degreesToRadians(arm.getAbsoluteEncoder().getPosition() - 180)) * 0.015);
                 armPositionController.calculate(arm.getAbsoluteAdjustedPosition());
-            }
+            } */
         }
 
         double targetVelocity = velocity.getAsDouble(); // Get velocity
