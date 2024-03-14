@@ -55,9 +55,9 @@ public class RobotContainer {
     private final Swerve s_Swerve = new Swerve();
     private final Photonvision s_Photonvision = new Photonvision(
                                                     "Apriltag Camera",
-                                                    27.25,
+                                                    26.75,
                                                     1.45,
-                                                    21
+                                                    18.5
                                                     );
     private final Arm s_Arm = new Arm();
     private final Intake s_Intake = new Intake();
@@ -74,6 +74,8 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_Photonvision, () -> 4500));
         NamedCommands.registerCommand("startIntake", new TeleopIntake(s_Intake, () -> 4000, true));
+        NamedCommands.registerCommand("stopIntake", new TeleopIntake(s_Intake, () -> 0, true));
+        NamedCommands.registerCommand("lowerArm", new SetArmPosition(s_Arm, () -> 23));
 
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");

@@ -15,11 +15,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.Photonvision;
+import frc.robot.subsystems.Swerve;
 
 
 public class LaunchNote extends Command {
@@ -44,6 +44,7 @@ public class LaunchNote extends Command {
 
     private double rotationSpeed = 0; // Define rotationSpeed as a default of 0
     boolean validTarget = false; // Define validTarget as a default of false
+    PhotonTrackedTarget target;
 
     private Timer finishedTimer = new Timer();
 
@@ -62,7 +63,7 @@ public class LaunchNote extends Command {
         armPositionController = new PIDController(ARM_P, ARM_I, ARM_D);
         turnController = new PIDController(ANGULAR_P, ANGULAR_I, ANGULAR_D);
     }
-    
+
     @Override
     public void initialize() {
         finishedTimer.start();
@@ -82,7 +83,6 @@ public class LaunchNote extends Command {
         * Configure arm and rotation PID controllers
         */
         turnController.setTolerance(1);
-        
         armPositionController.setTolerance(1);
         
         
@@ -91,7 +91,6 @@ public class LaunchNote extends Command {
         */
         PhotonPipelineResult result = photonvision.getLatestResult(); // Get latest result from photonvision
         if(result.hasTargets()) { // if a target is acquired
-            PhotonTrackedTarget target = result.getBestTarget(); // get best target
             List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
             
             if(targets.get(0).getFiducialId() == 4 || targets.get(0).getFiducialId() == 7) { // if the first target is 4 or 7, 
@@ -106,32 +105,49 @@ public class LaunchNote extends Command {
                 validTarget = false; // mark as having no valid target
             }
 
-            /*
-             * Configure the turning PID based on the target and gyroscope, plus an offset.
-             */
-            if(validTarget) {
-                turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
-
-                double armSetpoint = MathUtil.clamp(
-                                Units.radiansToDegrees(Math.atan(Units.inchesToMeters(80) / photonvision.getSpecificTargetRange(target))), // 85 inches
-                                23,
-                                90);
-                armPositionController.setSetpoint(armSetpoint);
-            } else {
-                turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
-
-            }
-
         } else { // if no target acquired
             validTarget = false;
             turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
+        }
+
+        if(validTarget) {
+            turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
         }
 
     }
 
     @Override
     public void execute() {
-        // Runs repeatedly after initialization
+
+        PhotonPipelineResult result = photonvision.getLatestResult(); // Get latest result from photonvision
+        if(result.hasTargets()) { // if a target is acquired
+            List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
+            
+            if(targets.get(0).getFiducialId() == 4 || targets.get(0).getFiducialId() == 7) { // if the first target is 4 or 7, 
+                target = targets.get(0); // set the target to use as the first target
+                validTarget = true; // and mark as having a valid target
+            } else if (targets.size() > 1) { // otherwise if the list of targets is more than 1
+                if(targets.get(1).getFiducialId() == 4 || targets.get(1).getFiducialId() == 7) { // and if the second target is 4 or 7 (assuming the camera will only see the two targets at the same time)
+                    target = targets.get(1); // set the target to use as the second target
+                    validTarget = true; // and mark as having a valid target
+                }
+            } else { // otherwise
+                // validTarget = false; // mark as having no valid target
+            }
+        }
+        /*
+         * Configure the turning PID based on the target and gyroscope, plus an offset.
+         */
+        if(validTarget) {
+            double armSetpoint = MathUtil.clamp(
+                            Units.radiansToDegrees(Math.atan(Units.inchesToMeters(84) / photonvision.getSpecificTargetRange(target))), // 85 inches
+                            23,
+                            90);
+            armPositionController.setSetpoint(armSetpoint);
+        } else {
+            turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
+
+        }
 
         /*
          * Calculating the rotation output
@@ -203,6 +219,7 @@ public class LaunchNote extends Command {
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
         launcher.getOuttakePID().setP(0); // set p to 0 as to not brake the motor
+        launcher.outtake(0);
         intake.intake(0);
         finishedTimer.stop();
     }

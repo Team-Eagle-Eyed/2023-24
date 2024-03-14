@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +25,7 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Left Arm Motor", leftMotor.get());
         SmartDashboard.putNumber("Right Arm Motor", rightMotor.get());
         SmartDashboard.putNumber("Left Motor position", leftMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Right Motor position", rightMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Left Motor absolute position", getAbsoluteAdjustedPosition());
     }
 
@@ -42,22 +42,22 @@ public class Arm extends SubsystemBase {
 
         leftMotor.getPIDController().setFeedbackDevice(leftMotor.getAbsoluteEncoder());
 
-        leftMotor.setSoftLimit(SoftLimitDirection.kForward, 0); //TODO: Tune this
-        leftMotor.setSoftLimit(SoftLimitDirection.kReverse, -80); //TODO: Tune this
+        leftMotor.setSmartCurrentLimit(30);
+        rightMotor.setSmartCurrentLimit(30);
 
-        rightMotor.setSoftLimit(SoftLimitDirection.kForward, 80); //TODO: Tune this
-        rightMotor.setSoftLimit(SoftLimitDirection.kReverse, 0); //TODO: Tune this
-
-        leftMotor.setSmartCurrentLimit(50);
-        rightMotor.setSmartCurrentLimit(50);
+        rightMotor.follow(leftMotor, true);
 
         leftMotor.burnFlash();
         rightMotor.burnFlash();
     }
 
     public void drive(double speed) {
-        leftMotor.set(-speed);
-        rightMotor.set(speed);
+        if (leftMotor.getEncoder().getPosition() > -80 || speed < 0) {
+            leftMotor.set(-speed);
+        } else {
+            leftMotor.set(0);
+        }
+        // rightMotor.set(speed);
     }
 
     public SparkPIDController getPIDController() {

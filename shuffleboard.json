@@ -306,6 +306,19 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "8,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Right Motor position",
+              "_title": "SmartDashboard/Right Motor position",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -443,6 +456,19 @@
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "3,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto Chooser",
+              "_title": "SmartDashboard/Auto Chooser",
+              "_glyph": 148,
+              "_showGlyph": false
             }
           }
         }
