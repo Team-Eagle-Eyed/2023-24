@@ -5,20 +5,20 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Photonvision;
+import frc.robot.subsystems.ApriltagCamera;
 import frc.robot.subsystems.Swerve;
 
 public class CenterTarget extends Command {
 
     private Swerve m_Swerve;
-    private Photonvision photonvision;
+    private ApriltagCamera photonvision;
 
     // PID constants should be tuned per robot
     private final double ANGULAR_P = 0.1;
     private final double ANGULAR_D = 0.0;
     PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
 
-    public CenterTarget(Swerve m_swerve, Photonvision photonvision) {
+    public CenterTarget(Swerve m_swerve, ApriltagCamera photonvision) {
         addRequirements(m_swerve, photonvision);
         this.m_Swerve = m_swerve;
         this.photonvision = photonvision;

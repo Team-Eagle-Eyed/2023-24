@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
-import frc.robot.subsystems.Photonvision;
+import frc.robot.subsystems.ApriltagCamera;
 import frc.robot.subsystems.Swerve;
 
 
@@ -27,7 +27,7 @@ public class LaunchNote extends Command {
     private Outtake launcher;
     private DoubleSupplier velocity;
     private Intake intake;
-    private Photonvision photonvision;
+    private ApriltagCamera photonvision;
     private Swerve swerve;
     private Arm arm;
 
@@ -48,7 +48,7 @@ public class LaunchNote extends Command {
 
     private Timer finishedTimer = new Timer();
 
-    public LaunchNote(Swerve swerve, Arm arm, Outtake launcher, Intake intake, Photonvision photonvision, DoubleSupplier velocity) {
+    public LaunchNote(Swerve swerve, Arm arm, Outtake launcher, Intake intake, ApriltagCamera photonvision, DoubleSupplier velocity) {
         addRequirements(swerve, arm, launcher, intake, photonvision);
         this.swerve = swerve;
         this.arm = arm;
@@ -139,14 +139,12 @@ public class LaunchNote extends Command {
          * Configure the turning PID based on the target and gyroscope, plus an offset.
          */
         if(validTarget) {
-            double targetHeight = MathUtil.clamp(
-                                    SmartDashboard.getNumber("targetHeight", 84),
-                                    70,
-                                    90);
+            double targetHeight = SmartDashboard.getNumber("targetHeight", 84);
             double armSetpoint = MathUtil.clamp(
                             Units.radiansToDegrees(Math.atan(Units.inchesToMeters(targetHeight) / photonvision.getSpecificTargetRange(target))), // 85 inches
                             23,
                             90);
+            SmartDashboard.putNumber("armLaunchSetpoint", armSetpoint);
             armPositionController.setSetpoint(armSetpoint);
         } else {
             turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.

@@ -52,10 +52,10 @@ public class Arm extends SubsystemBase {
     }
 
     public void drive(double speed) {
-        if (leftMotor.getEncoder().getPosition() > -80 || speed < 0) {
-            leftMotor.set(-speed);
-        } else {
+        if ((getAbsoluteAdjustedPosition() > 175 && speed > 0) || (getAbsoluteAdjustedPosition() < 23 && speed < 0)) {
             leftMotor.set(0);
+        } else {
+            leftMotor.set(-speed);
         }
         // rightMotor.set(speed);
     }

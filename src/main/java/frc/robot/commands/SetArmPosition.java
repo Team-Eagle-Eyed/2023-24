@@ -19,12 +19,12 @@ public class SetArmPosition extends Command {
         addRequirements(arm);
         this.arm = arm;
         this.position = position;
-        positionController = new PIDController(0.03, 0.0005, 0);
     }
     
     @Override
     public void initialize() {
         // Runs once on start
+        positionController = new PIDController(0.03, 0.0005, 0);
         positionController.setSetpoint(MathUtil.clamp(position.getAsDouble(), 23, 90));
         positionController.setTolerance(1);
     }
@@ -39,7 +39,7 @@ public class SetArmPosition extends Command {
     @Override
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
-        positionController.setP(0);
+        positionController.close();
         // arm.getPIDController().setReference(0, ControlType.kVelocity);
     }
 

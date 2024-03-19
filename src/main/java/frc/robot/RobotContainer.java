@@ -25,6 +25,7 @@ public class RobotContainer {
     /* Controllers */
     private final Joystick driver = new Joystick(0);
     private final Joystick operator = new Joystick(1);
+    private final Joystick buttonBoard = new Joystick(2);
 
     /* Drive Controls */
     private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -45,17 +46,24 @@ public class RobotContainer {
 
     /* Operator Buttons */
     private final JoystickButton launchNote = new JoystickButton(operator, XboxController.Button.kA.value);
-    private final JoystickButton setArmPosition = new JoystickButton(operator, XboxController.Button.kX.value);
     private final JoystickButton reverseIntake = new JoystickButton(operator, XboxController.Button.kB.value);
+
+    /* Button Board Buttons */
+    private final JoystickButton estop = new JoystickButton(buttonBoard, 1);
+    private final JoystickButton raiseArm = new JoystickButton(buttonBoard, 2);
+    private final JoystickButton resetArm = new JoystickButton(buttonBoard, 3);
+    private final JoystickButton launchNoteButtonBoard = new JoystickButton(buttonBoard, 4);
+    private final JoystickButton goToNote = new JoystickButton(buttonBoard, 5);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
-    private final Photonvision s_Photonvision = new Photonvision(
+    private final ApriltagCamera s_ApriltagCamera = new ApriltagCamera(
                                                     "Apriltag Camera",
                                                     25,
                                                     1.45,
-                                                    15
+                                                    18.5
                                                     );
+    private final NoteCamera s_NoteCamera = new NoteCamera("Note Camera");
     private final Arm s_Arm = new Arm();
     private final Intake s_Intake = new Intake();
     private final Outtake s_Outtake = new Outtake();
@@ -69,7 +77,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
 
-        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_Photonvision, () -> 4500));
+        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_ApriltagCamera, () -> 4500));
         NamedCommands.registerCommand("startIntake", new TeleopIntake(s_Intake, () -> 4000, true));
         NamedCommands.registerCommand("stopIntake", new TeleopIntake(s_Intake, () -> 0, true));
         NamedCommands.registerCommand("lowerArm", new SetArmPosition(s_Arm, () -> 23));
@@ -147,14 +155,26 @@ public class RobotContainer {
                                     s_Arm,
                                     s_Outtake,
                                     s_Intake,
-                                    s_Photonvision,
+                                    s_ApriltagCamera,
+                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4500)
+                                    )
+                                );
+        launchNoteButtonBoard.whileTrue(new LaunchNote(
+                                    s_Swerve,
+                                    s_Arm,
+                                    s_Outtake,
+                                    s_Intake,
+                                    s_ApriltagCamera,
                                     () -> SmartDashboard.getNumber("Launcher set velocity", 4500)
                                     )
                                 );
         reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false));
         reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, () -> -0.25));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
-        setArmPosition.whileTrue(new SetArmPosition(s_Arm, () -> 90));
+        raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));
+        resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
+        goToNote.whileTrue(new GoToNote(s_Swerve, s_NoteCamera));
+        estop.whileTrue(new Estop(s_Swerve, s_Arm, s_Intake, s_Outtake));
     }
 
     /**
