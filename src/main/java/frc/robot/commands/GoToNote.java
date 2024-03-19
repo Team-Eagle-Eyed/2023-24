@@ -22,7 +22,7 @@ public class GoToNote extends Command {
     @Override
     public void initialize() {
         // Runs once on start
-        turnController = new PIDController(0.15, 0, 0); // I 0.3?
+        turnController = new PIDController(0.05, 0, 0); // I 0.3?
         turnController.setSetpoint(0);
         turnController.setTolerance(1);
     }
@@ -31,7 +31,7 @@ public class GoToNote extends Command {
     public void execute() {
         // Runs repeatedly after initialization
         double rotationOutput = turnController.calculate(m_NoteCamera.getLatestResult().getBestTarget().getYaw());
-        m_swerve.drive(new Translation2d(), rotationOutput, false, true);
+        m_swerve.drive(new Translation2d(0, rotationOutput), 0, false, true);
     }
 
     @Override
