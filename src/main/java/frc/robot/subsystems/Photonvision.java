@@ -29,7 +29,7 @@ public class Photonvision extends SubsystemBase {
     @Override
     public void periodic(){
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
-        SmartDashboard.putNumber("rangeToTarget", getTargetRange());
+        SmartDashboard.putNumber("rangeToTarget", Units.metersToInches(getTargetRange()));
     }
 
     public PhotonPipelineResult getLatestResult() {

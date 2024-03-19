@@ -42,8 +42,8 @@ public class Arm extends SubsystemBase {
 
         leftMotor.getPIDController().setFeedbackDevice(leftMotor.getAbsoluteEncoder());
 
-        leftMotor.setSmartCurrentLimit(30);
-        rightMotor.setSmartCurrentLimit(30);
+        leftMotor.setSmartCurrentLimit(35);
+        rightMotor.setSmartCurrentLimit(35);
 
         rightMotor.follow(leftMotor, true);
 

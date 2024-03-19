@@ -6,7 +6,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,7 +35,7 @@ public class RobotContainer {
     /* Driver Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton playMusic = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final JoystickButton driverIntake = new JoystickButton(driver, XboxController.Button.kA.value);
     private final JoystickButton resetWheels = new JoystickButton(driver, XboxController.Button.kB.value);
 
     /* Operator Controls */
@@ -49,15 +48,13 @@ public class RobotContainer {
     private final JoystickButton setArmPosition = new JoystickButton(operator, XboxController.Button.kX.value);
     private final JoystickButton reverseIntake = new JoystickButton(operator, XboxController.Button.kB.value);
 
-    private final JoystickButton rumbleTemp = new JoystickButton(operator, XboxController.Button.kY.value);
-
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Photonvision s_Photonvision = new Photonvision(
                                                     "Apriltag Camera",
-                                                    26.75,
+                                                    25,
                                                     1.45,
-                                                    18.5
+                                                    15
                                                     );
     private final Arm s_Arm = new Arm();
     private final Intake s_Intake = new Intake();
@@ -89,9 +86,11 @@ public class RobotContainer {
         SmartDashboard.putNumber("SpeedLimit", 1);
         SmartDashboard.putNumber("ShooterSpeed", 1);
         SmartDashboard.putData("Music Selector", musicSelector);
+        SmartDashboard.putData("Auto Chooser", new SendableChooser<>()); // Clear previous options?
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         SmartDashboard.putNumber("Launcher set velocity", 4500);
+        SmartDashboard.putNumber("targetHeight", 84);
 
         SmartDashboard.putNumber("armP", 0);
         SmartDashboard.putNumber("armI", 0);
@@ -99,7 +98,7 @@ public class RobotContainer {
 
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
-                s_Swerve, 
+                s_Swerve,
                 () -> -driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(strafeAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(rotationAxis) * 0.60 * SmartDashboard.getNumber("SpeedLimit", 1),
@@ -142,22 +141,20 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-        playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
+        driverIntake.whileTrue(new TeleopIntake(s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 4000), true));
         launchNote.whileTrue(new LaunchNote(
                                     s_Swerve,
                                     s_Arm,
                                     s_Outtake,
                                     s_Intake,
                                     s_Photonvision,
-                                    () -> SmartDashboard.getNumber("Launcher set velocity", 0)
+                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4500)
                                     )
                                 );
         reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false));
         reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, () -> -0.25));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         setArmPosition.whileTrue(new SetArmPosition(s_Arm, () -> 90));
-        rumbleTemp.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 1)));
-        rumbleTemp.onFalse(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
     }
 
     /**

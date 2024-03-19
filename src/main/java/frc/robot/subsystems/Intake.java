@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -48,7 +49,16 @@ public class Intake extends SubsystemBase {
 
     public void intake(double speed) {
         intakeBottom.set(speed);
-        // intakeTop.set(-speed);
+    }
+
+    public void setIntakeVelocity(double velocity) {
+        if (noteSensor.get()) {
+            getIntakePID().setReference(velocity, ControlType.kVelocity);
+        } else if (!noteSensor.get()){
+            intakeBottom.set(-0.25);
+        } else {
+            intakeBottom.set(0);
+        }
     }
 
     public RelativeEncoder getIntakeEncoder() {
