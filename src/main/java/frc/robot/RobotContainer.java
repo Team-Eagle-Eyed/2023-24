@@ -173,7 +173,7 @@ public class RobotContainer {
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));
         resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
-        goToNote.whileTrue(new GoToNote(s_Swerve, s_NoteCamera));
+        goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
         estop.whileTrue(new Estop(s_Swerve, s_Arm, s_Intake, s_Outtake));
     }
 
