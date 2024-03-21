@@ -107,6 +107,7 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
+                s_ApriltagCamera,
                 () -> -driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(strafeAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(rotationAxis) * 0.60 * SmartDashboard.getNumber("SpeedLimit", 1),
@@ -156,7 +157,7 @@ public class RobotContainer {
                                     s_Outtake,
                                     s_Intake,
                                     s_ApriltagCamera,
-                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4500)
+                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4050)
                                     )
                                 );
         launchNoteButtonBoard.whileTrue(new LaunchNote(
@@ -165,10 +166,10 @@ public class RobotContainer {
                                     s_Outtake,
                                     s_Intake,
                                     s_ApriltagCamera,
-                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4500)
+                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4050)
                                     )
                                 );
-        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.25, false));
+        reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.5, false));
         reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, () -> -0.25));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));

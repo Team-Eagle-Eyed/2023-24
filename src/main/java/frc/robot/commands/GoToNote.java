@@ -60,7 +60,7 @@ public class GoToNote extends Command {
             noteCentered = true;
         }
         if(noteCentered == true) {
-            translationOutput = 1;
+            translationOutput = 2;
         }
         m_swerve.drive(
             new Translation2d(translationOutput, strafeOutput),

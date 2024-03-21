@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
+import frc.robot.subsystems.ApriltagCamera;
 import frc.robot.subsystems.Swerve;
 
 import java.util.function.BooleanSupplier;
@@ -13,13 +14,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class TeleopSwerve extends Command {    
     private Swerve s_Swerve;    
+    private ApriltagCamera camera;
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
     private DoubleSupplier rotationSup;
     private BooleanSupplier robotCentricSup;
 
-    public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
+    public TeleopSwerve(Swerve s_Swerve, ApriltagCamera camera, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
         this.s_Swerve = s_Swerve;
+        this.camera = camera;
         addRequirements(s_Swerve);
 
         this.translationSup = translationSup;
@@ -42,5 +45,9 @@ public class TeleopSwerve extends Command {
             !robotCentricSup.getAsBoolean(), 
             true
         );
+
+        if(camera.getEstimatedGlobalPose().isPresent()) {
+            s_Swerve.getPoseEstimatior().addVisionMeasurement(camera.getEstimatedGlobalPose().get().estimatedPose.toPose2d(), camera.getEstimatedGlobalPose().get().timestampSeconds);
+        }
     }
 }
