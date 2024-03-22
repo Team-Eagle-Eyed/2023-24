@@ -5,7 +5,6 @@ import frc.robot.Constants;
 import frc.robot.PositionListener;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import java.util.Optional;
@@ -31,10 +30,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase implements PositionListener {
-    public SwerveDriveOdometry swerveOdometry;
+    public SwerveDrivePoseEstimator mPoseEstimator; 
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
-    public SwerveDrivePoseEstimator mPoseEstimator;
 
     public Swerve() {
         gyro = new Pigeon2(Constants.Swerve.pigeonID, "CANivore");
@@ -47,8 +45,6 @@ public class Swerve extends SubsystemBase implements PositionListener {
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
-
-        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions());
 
         mPoseEstimator = new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics,
@@ -182,11 +178,11 @@ public class Swerve extends SubsystemBase implements PositionListener {
     }
 
     public Pose2d getPose() {
-        return swerveOdometry.getPoseMeters();
+        return mPoseEstimator.getEstimatedPosition();
     }
 
     public void setPose(Pose2d pose) {
-        swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
+        mPoseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
     }
 
     public SwerveDrivePoseEstimator getPoseEstimatior() {
@@ -198,11 +194,11 @@ public class Swerve extends SubsystemBase implements PositionListener {
     }
 
     public void setHeading(Rotation2d heading){
-        swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
+        mPoseEstimator.resetPosition(getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
     }
 
     public void zeroHeading(){
-        swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
+        mPoseEstimator.resetPosition(getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
     public Rotation2d getGyroYaw() {
@@ -217,7 +213,6 @@ public class Swerve extends SubsystemBase implements PositionListener {
 
     @Override
     public void periodic(){
-        swerveOdometry.update(getGyroYaw(), getModulePositions());
         mPoseEstimator.update(getGyroYaw(), getModulePositions());
 
         for(SwerveModule mod : mSwerveMods){
