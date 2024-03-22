@@ -139,6 +139,8 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        s_ApriltagCamera.addPositionListener(s_Swerve);
     }
 
     /**

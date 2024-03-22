@@ -49,7 +49,7 @@ public class LaunchNote extends Command {
     private Timer finishedTimer = new Timer();
 
     public LaunchNote(Swerve swerve, Arm arm, Outtake launcher, Intake intake, ApriltagCamera photonvision, DoubleSupplier velocity) {
-        addRequirements(swerve, arm, launcher, intake, photonvision);
+        addRequirements(swerve, arm, launcher, intake);
         this.swerve = swerve;
         this.arm = arm;
         this.launcher = launcher;

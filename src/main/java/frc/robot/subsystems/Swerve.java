@@ -2,11 +2,15 @@ package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
 import frc.robot.Constants;
-
+import frc.robot.PositionListener;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -26,7 +30,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Swerve extends SubsystemBase {
+public class Swerve extends SubsystemBase implements PositionListener {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
@@ -79,6 +83,13 @@ public class Swerve extends SubsystemBase {
             },
             this // Reference to this subsystem to set requirements
     );
+    }
+
+    @Override
+    public void onPositionUpdate(Optional<EstimatedRobotPose> newPosition) {
+        if(newPosition.isPresent()) {
+            mPoseEstimator.addVisionMeasurement(newPosition.get().estimatedPose.toPose2d(), newPosition.get().timestampSeconds);
+        }
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {

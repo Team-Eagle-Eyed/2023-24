@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -12,13 +14,13 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.PositionListener;
 
 public class ApriltagCamera extends SubsystemBase {
 
@@ -32,6 +34,8 @@ public class ApriltagCamera extends SubsystemBase {
 
     private AprilTagFieldLayout layout;
     private PhotonPoseEstimator estimator;
+
+    private final List<PositionListener> listeners = new ArrayList<>();
 
     public ApriltagCamera(String cameraID, double CAMERA_HEIGHT_INCHES, double TARGET_HEIGHT_METERS, double CAMERA_PITCH_DEGREES) {
         this.camera = new PhotonCamera(cameraID);
@@ -53,6 +57,7 @@ public class ApriltagCamera extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
         SmartDashboard.putNumber("rangeToTarget", Units.metersToInches(getTargetRange()));
+        notifyPositionUpdate(getEstimatedGlobalPose());
     }
 
     public PhotonPipelineResult getLatestResult() {
@@ -84,5 +89,15 @@ public class ApriltagCamera extends SubsystemBase {
 
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
         return estimator.update(getLatestResult());
+    }
+
+    public void addPositionListener(PositionListener listener) {
+        listeners.add(listener);
+    }
+
+    private void notifyPositionUpdate(Optional<EstimatedRobotPose> position) {
+        for (PositionListener listener : listeners) {
+            listener.onPositionUpdate(position);
+        }
     }
 }
