@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -34,10 +35,15 @@ public class Swerve extends SubsystemBase implements PositionListener {
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
 
+    private Field2d field;
+
     public Swerve() {
         gyro = new Pigeon2(Constants.Swerve.pigeonID, "CANivore");
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
+
+        field = new Field2d();
+        SmartDashboard.putData("Field", field);
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -50,7 +56,7 @@ public class Swerve extends SubsystemBase implements PositionListener {
             Constants.Swerve.swerveKinematics,
             getGyroYaw(),
             getModulePositions(),
-            getPose()
+            new Pose2d()
             );
 
         AutoBuilder.configureHolonomic(
@@ -83,8 +89,12 @@ public class Swerve extends SubsystemBase implements PositionListener {
 
     @Override
     public void onPositionUpdate(Optional<EstimatedRobotPose> newPosition) {
-        if(newPosition.isPresent()) {
-            mPoseEstimator.addVisionMeasurement(newPosition.get().estimatedPose.toPose2d(), newPosition.get().timestampSeconds);
+        if(newPosition.isPresent() && mPoseEstimator != null) {
+            /* mPoseEstimator.addVisionMeasurement(
+                newPosition.get().estimatedPose.toPose2d(),
+                newPosition.get().timestampSeconds
+                ); */
+            setPose(newPosition.get().estimatedPose.toPose2d());
         }
     }
 
@@ -215,12 +225,14 @@ public class Swerve extends SubsystemBase implements PositionListener {
     public void periodic(){
         mPoseEstimator.update(getGyroYaw(), getModulePositions());
 
-        for(SwerveModule mod : mSwerveMods){
+        for(SwerveModule mod : mSwerveMods) {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
 
         SmartDashboard.putNumber("Gyro", gyro.getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("z rotation", getPose().getRotation().getDegrees());
+        field.setRobotPose(getPose());
     }
 }

@@ -46,18 +46,29 @@ public class ApriltagCamera extends SubsystemBase {
         this.estimator = new PhotonPoseEstimator(
                                 layout,
                                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                                this.camera,
                                 new Transform3d(
-                                    new Translation3d(0, 0, 0),
-                                    new Rotation3d(0, 0, 0)
+                                    new Translation3d(
+                                        Units.inchesToMeters(8),
+                                        0,
+                                        Units.inchesToMeters(25)
+                                        ),
+                                    new Rotation3d(
+                                        Units.degreesToRadians(0),
+                                        Units.degreesToRadians(CAMERA_PITCH_DEGREES), // 17.5
+                                        Units.degreesToRadians(180) // 180?
                                     )
-                                );
+                                )
+                            );
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
         SmartDashboard.putNumber("rangeToTarget", Units.metersToInches(getTargetRange()));
-        notifyPositionUpdate(getEstimatedGlobalPose());
+        if(getEstimatedGlobalPose().isPresent()) {
+            notifyPositionUpdate(getEstimatedGlobalPose());
+        }
     }
 
     public PhotonPipelineResult getLatestResult() {
