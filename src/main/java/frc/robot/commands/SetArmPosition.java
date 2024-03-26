@@ -47,5 +47,6 @@ public class SetArmPosition extends Command {
     public boolean isFinished() {
         // Whether or not the command is finished
         return positionController.atSetpoint();
+        // return false;
     }
 }

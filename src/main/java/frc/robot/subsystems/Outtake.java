@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -41,6 +42,10 @@ public class Outtake extends SubsystemBase {
     public void outtake(double speed) {
         outtakeBottom.set(speed);
         // outtakeTop.set(-speed);
+    }
+
+    public void setOuttakeVelocity(double velocity) {
+        outtakeBottom.getPIDController().setReference(velocity, ControlType.kVelocity);
     }
 
     public RelativeEncoder getOuttakeEncoder() {

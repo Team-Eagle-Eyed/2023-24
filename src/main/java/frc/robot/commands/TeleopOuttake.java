@@ -12,11 +12,13 @@ public class TeleopOuttake extends Command {
 
     private Outtake outtake;
     private DoubleSupplier outtakeSpeed;
+    private Boolean useRPMs;
 
-    public TeleopOuttake(Outtake outtake, DoubleSupplier outtakeSpeed) {
+    public TeleopOuttake(Outtake outtake, DoubleSupplier outtakeSpeed, Boolean useRPMs) {
         addRequirements(outtake);
         this.outtake = outtake;
         this.outtakeSpeed = outtakeSpeed;
+        this.useRPMs = useRPMs;
     }
     
     @Override
@@ -27,7 +29,11 @@ public class TeleopOuttake extends Command {
     @Override
     public void execute() {
         // Runs repeatedly after initialization
-        outtake.outtake(MathUtil.applyDeadband(outtakeSpeed.getAsDouble(), Constants.stickDeadband));
+        if(useRPMs) {
+            outtake.setOuttakeVelocity(outtakeSpeed.getAsDouble());
+        } else {
+            outtake.outtake(MathUtil.applyDeadband(outtakeSpeed.getAsDouble(), Constants.stickDeadband));   
+        }
     }
 
     @Override
