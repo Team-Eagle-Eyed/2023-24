@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -12,13 +14,13 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.PositionListener;
 
 public class ApriltagCamera extends SubsystemBase {
 
@@ -33,6 +35,8 @@ public class ApriltagCamera extends SubsystemBase {
     private AprilTagFieldLayout layout;
     private PhotonPoseEstimator estimator;
 
+    private final List<PositionListener> listeners = new ArrayList<>();
+
     public ApriltagCamera(String cameraID, double CAMERA_HEIGHT_INCHES, double TARGET_HEIGHT_METERS, double CAMERA_PITCH_DEGREES) {
         this.camera = new PhotonCamera(cameraID);
         this.CAMERA_HEIGHT_METERS = Units.inchesToMeters(CAMERA_HEIGHT_INCHES);
@@ -42,17 +46,29 @@ public class ApriltagCamera extends SubsystemBase {
         this.estimator = new PhotonPoseEstimator(
                                 layout,
                                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                                this.camera,
                                 new Transform3d(
-                                    new Translation3d(0, 0, 0),
-                                    new Rotation3d(0, 0, 0)
+                                    new Translation3d(
+                                        Units.inchesToMeters(8),
+                                        0,
+                                        Units.inchesToMeters(25)
+                                        ),
+                                    new Rotation3d(
+                                        Units.degreesToRadians(0),
+                                        Units.degreesToRadians(CAMERA_PITCH_DEGREES), // 17.5
+                                        Units.degreesToRadians(180) // 180?
                                     )
-                                );
+                                )
+                            );
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
         SmartDashboard.putNumber("rangeToTarget", Units.metersToInches(getTargetRange()));
+        if(getEstimatedGlobalPose().isPresent()) {
+            notifyPositionUpdate(getEstimatedGlobalPose());
+        }
     }
 
     public PhotonPipelineResult getLatestResult() {
@@ -84,5 +100,15 @@ public class ApriltagCamera extends SubsystemBase {
 
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
         return estimator.update(getLatestResult());
+    }
+
+    public void addPositionListener(PositionListener listener) {
+        listeners.add(listener);
+    }
+
+    private void notifyPositionUpdate(Optional<EstimatedRobotPose> position) {
+        for (PositionListener listener : listeners) {
+            listener.onPositionUpdate(position);
+        }
     }
 }

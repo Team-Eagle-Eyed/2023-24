@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -61,7 +62,7 @@ public class RobotContainer {
                                                     "Apriltag Camera",
                                                     25,
                                                     1.45,
-                                                    18.5
+                                                    20
                                                     );
     private final NoteCamera s_NoteCamera = new NoteCamera("Note Camera");
     private final Arm s_Arm = new Arm();
@@ -104,6 +105,8 @@ public class RobotContainer {
         SmartDashboard.putNumber("armI", 0);
         SmartDashboard.putNumber("armD", 0);
 
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
@@ -111,7 +114,8 @@ public class RobotContainer {
                 () -> -driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(strafeAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(rotationAxis) * 0.60 * SmartDashboard.getNumber("SpeedLimit", 1),
-                () -> robotCentric.getAsBoolean()
+                () -> robotCentric.getAsBoolean(),
+                () -> false
             )
         );
 
@@ -139,6 +143,8 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        s_ApriltagCamera.addPositionListener(s_Swerve);
     }
 
     /**
