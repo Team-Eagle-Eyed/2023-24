@@ -90,11 +90,11 @@ public class Swerve extends SubsystemBase implements PositionListener {
     @Override
     public void onPositionUpdate(Optional<EstimatedRobotPose> newPosition) {
         if(newPosition.isPresent() && mPoseEstimator != null) {
-            /* mPoseEstimator.addVisionMeasurement(
+            mPoseEstimator.addVisionMeasurement(
                 newPosition.get().estimatedPose.toPose2d(),
                 newPosition.get().timestampSeconds
-                ); */
-            setPose(newPosition.get().estimatedPose.toPose2d());
+                );
+            // setPose(newPosition.get().estimatedPose.toPose2d());
         }
     }
 

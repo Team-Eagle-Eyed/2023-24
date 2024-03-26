@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
+import frc.robot.Constants;
 import frc.robot.subsystems.ApriltagCamera;
 import frc.robot.subsystems.Swerve;
 
@@ -112,6 +114,29 @@ public class LaunchNote extends Command {
 
         if(validTarget) {
             turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
+        }
+        
+        double angleSetpoint = 0;
+        double speedSetpoint = 0;
+        double distance = photonvision.getSpecificTargetRange(target);
+        double[] distances = Constants.distances;
+        int index = Arrays.binarySearch(distances, distance);
+        if(index >= 0) {
+            angleSetpoint = Constants.angleSpeedPairs[index][0];
+        } else {
+            int idx2 = Math.abs(index + 1);
+            int idx1 = idx2 - 1;
+            double[] pair1 = Constants.angleSpeedPairs[idx1];
+            double[] pair2 = Constants.angleSpeedPairs[idx2];
+            double[] interpolatedPair = new double[2];
+            double frac = (distance - distances[idx1]) / (distances[idx2] - distances[idx1]);
+            // Interpolate angle
+            interpolatedPair[0] = pair1[0] + frac * (pair2[0] - pair1[0]);
+            // Interpolate speed
+            interpolatedPair[1] = pair1[1] + frac * (pair2[1] - pair1[1]);
+
+            angleSetpoint = interpolatedPair[0];
+            speedSetpoint = interpolatedPair[1];
         }
 
     }

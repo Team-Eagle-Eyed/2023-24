@@ -62,7 +62,7 @@ public class RobotContainer {
                                                     "Apriltag Camera",
                                                     25,
                                                     1.45,
-                                                    18.5
+                                                    20
                                                     );
     private final NoteCamera s_NoteCamera = new NoteCamera("Note Camera");
     private final Arm s_Arm = new Arm();

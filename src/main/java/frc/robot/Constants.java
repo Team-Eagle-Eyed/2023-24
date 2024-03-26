@@ -144,4 +144,10 @@ public final class Constants {
             new TrapezoidProfile.Constraints(
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
+
+    public static final double[] distances = {1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5.5, 6};
+    public static final double[][] angleSpeedPairs = {
+        {1.0, 2.0},
+        {4.0, 5.0}
+    };
 }
