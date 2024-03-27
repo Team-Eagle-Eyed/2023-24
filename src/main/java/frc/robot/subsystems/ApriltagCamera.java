@@ -14,10 +14,14 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.PositionListener;
@@ -100,6 +104,15 @@ public class ApriltagCamera extends SubsystemBase {
 
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
         return estimator.update(getLatestResult());
+    }
+
+    public Pose2d getSpeakerPose() {
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        if(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) { // if alliance is red
+            return new Pose2d(16.58, 5.55, new Rotation2d()); // return position of tag 4 (red speaker middle)
+        } else { // or if alliance is blue or no alliance
+            return new Pose2d(-0.04, 5.55, new Rotation2d()); // return position of tag 7 (blue speaker middle)
+        }
     }
 
     public void addPositionListener(PositionListener listener) {

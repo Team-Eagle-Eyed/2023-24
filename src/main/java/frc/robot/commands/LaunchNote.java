@@ -3,6 +3,7 @@ package frc.robot.commands;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -11,7 +12,6 @@ import com.revrobotics.CANSparkBase.ControlType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -138,7 +138,8 @@ public class LaunchNote extends Command {
          * Configure the turning PID based on the target and gyroscope, plus an offset.
          */
         if(validTarget) {
-            double targetRange = photonvision.getSpecificTargetRange(target);
+            // double targetRange = photonvision.getSpecificTargetRange(target);
+            double targetRange = PhotonUtils.getDistanceToPose(swerve.getPose(), photonvision.getSpeakerPose());
             /* double targetHeight = SmartDashboard.getNumber("targetHeight", 84);
             double armSetpoint = MathUtil.clamp(
                             Units.radiansToDegrees(Math.atan(Units.inchesToMeters(targetHeight) / targetRange)), // 85 inches
