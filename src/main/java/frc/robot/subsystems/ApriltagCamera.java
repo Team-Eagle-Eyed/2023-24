@@ -15,7 +15,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -69,7 +68,7 @@ public class ApriltagCamera extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
-        SmartDashboard.putNumber("rangeToTarget", Units.metersToInches(getTargetRange()));
+        // SmartDashboard.putNumber("rangeToTarget", Units.metersToInches(getTargetRange()));
         if(getEstimatedGlobalPose().isPresent()) {
             notifyPositionUpdate(getEstimatedGlobalPose());
         }
@@ -91,6 +90,10 @@ public class ApriltagCamera extends SubsystemBase {
         } else {
             return 0;
         }
+    }
+
+    public double getEstimatedRangePose(Pose2d robotPose) {
+        return PhotonUtils.getDistanceToPose(robotPose, getSpeakerPose());
     }
 
     public double getSpecificTargetRange(PhotonTrackedTarget target) {

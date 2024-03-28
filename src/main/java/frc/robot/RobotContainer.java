@@ -56,18 +56,13 @@ public class RobotContainer {
     private final JoystickButton launchNoteButtonBoard = new JoystickButton(buttonBoard, 4);
     private final JoystickButton goToNote = new JoystickButton(buttonBoard, 5);
 
-    private final JoystickButton increaseAngle = new JoystickButton(buttonBoard, 6);
-    private final JoystickButton decreaseAngle = new JoystickButton(buttonBoard, 9);
-    private final JoystickButton increaseAngleHalf = new JoystickButton(buttonBoard, 7);
-    private final JoystickButton decreaseAngleHalf = new JoystickButton(buttonBoard, 10);
-
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final ApriltagCamera s_ApriltagCamera = new ApriltagCamera(
                                                     "Apriltag Camera",
                                                     25,
                                                     1.45,
-                                                    18.5
+                                                    20
                                                     );
     private final NoteCamera s_NoteCamera = new NoteCamera("Note Camera");
     private final Arm s_Arm = new Arm();
@@ -126,17 +121,10 @@ public class RobotContainer {
             )
         );
 
-        /* s_Arm.setDefaultCommand(
+        s_Arm.setDefaultCommand(
             new TeleopArm(
                 s_Arm,
                 () -> -operator.getRawAxis(armAxis)
-            )
-        ); */
-
-        s_Arm.setDefaultCommand(
-            new SetArmPosition(
-                s_Arm,
-                () -> SmartDashboard.getNumber("setArmPosition", 23)
             )
         );
 
@@ -197,19 +185,6 @@ public class RobotContainer {
         resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
         goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
         estop.whileTrue(new Estop(s_Swerve, s_Arm, s_Intake, s_Outtake));
-
-        increaseAngle.onTrue(new InstantCommand(() -> {
-            SmartDashboard.putNumber("setArmPosition", SmartDashboard.getNumber("setArmPosition", 23) + 1);
-        }));
-        decreaseAngle.onTrue(new InstantCommand(() -> {
-            SmartDashboard.putNumber("setArmPosition", SmartDashboard.getNumber("setArmPosition", 23) - 1);
-        }));
-        increaseAngleHalf.onTrue(new InstantCommand(() -> {
-            SmartDashboard.putNumber("setArmPosition", SmartDashboard.getNumber("setArmPosition", 23) + 0.5);
-        }));
-        decreaseAngleHalf.onTrue(new InstantCommand(() -> {
-            SmartDashboard.putNumber("setArmPosition", SmartDashboard.getNumber("setArmPosition", 23) - 0.5);
-        }));
     }
 
     /**
