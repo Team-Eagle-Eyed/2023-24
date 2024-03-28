@@ -54,7 +54,7 @@ public class ApriltagCamera extends SubsystemBase {
                                 new Transform3d(
                                     new Translation3d(
                                         Units.inchesToMeters(8),
-                                        0,
+                                        Units.inchesToMeters(0),
                                         Units.inchesToMeters(25)
                                         ),
                                     new Rotation3d(
@@ -109,9 +109,9 @@ public class ApriltagCamera extends SubsystemBase {
     public Pose2d getSpeakerPose() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
         if(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) { // if alliance is red
-            return new Pose2d(16.58, 5.55, new Rotation2d()); // return position of tag 4 (red speaker middle)
+            return layout.getTagPose(4).get().toPose2d(); // return position of tag 4 (red speaker middle)
         } else { // or if alliance is blue or no alliance
-            return new Pose2d(-0.04, 5.55, new Rotation2d()); // return position of tag 7 (blue speaker middle)
+            return layout.getTagPose(7).get().toPose2d(); // return position of tag 7 (blue speaker middle)
         }
     }
 

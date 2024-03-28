@@ -106,8 +106,7 @@ public class LaunchNote extends Command {
             }
 
         } else { // if no target acquired
-            validTarget = false;
-            turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
+            validTarget = false; // mark as having no valid target
         }
 
         if(validTarget) {
@@ -152,10 +151,8 @@ public class LaunchNote extends Command {
                 );
             SmartDashboard.putNumber("armLaunchSetpoint", armSetpoint);
             armPositionController.setSetpoint(armSetpoint);
-        } else {
-            turnController.setSetpoint(0); // Turncontroller isn't used if validTarget is false anyway. I set this in case turnController.calculate() would throw an error without it.
-
         }
+
 
         /*
          * Calculating the rotation output
