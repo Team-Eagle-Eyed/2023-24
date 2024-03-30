@@ -30,7 +30,7 @@ public class ApriltagCamera extends SubsystemBase {
     PhotonCamera camera;
 
     private double CAMERA_HEIGHT_METERS;
-    private double TARGET_HEIGHT_METERS;
+    private double TAG_HEIGHT_METERS;
 
     // Angle between horizontal and the camera.
     private double CAMERA_PITCH_RADIANS;
@@ -40,10 +40,10 @@ public class ApriltagCamera extends SubsystemBase {
 
     private final List<PositionListener> listeners = new ArrayList<>();
 
-    public ApriltagCamera(String cameraID, double CAMERA_HEIGHT_INCHES, double TARGET_HEIGHT_METERS, double CAMERA_PITCH_DEGREES) {
+    public ApriltagCamera(String cameraID, double CAMERA_HEIGHT_INCHES, double TAG_HEIGHT_METERS, double CAMERA_PITCH_DEGREES) {
         this.camera = new PhotonCamera(cameraID);
         this.CAMERA_HEIGHT_METERS = Units.inchesToMeters(CAMERA_HEIGHT_INCHES);
-        this.TARGET_HEIGHT_METERS = TARGET_HEIGHT_METERS;
+        this.TAG_HEIGHT_METERS = TAG_HEIGHT_METERS;
         this.CAMERA_PITCH_RADIANS = Units.degreesToRadians(CAMERA_PITCH_DEGREES);
         this.layout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
         this.estimator = new PhotonPoseEstimator(
@@ -83,7 +83,7 @@ public class ApriltagCamera extends SubsystemBase {
         if (result.hasTargets()) {
             double range = PhotonUtils.calculateDistanceToTargetMeters(
                 CAMERA_HEIGHT_METERS,
-                TARGET_HEIGHT_METERS,
+                TAG_HEIGHT_METERS,
                 CAMERA_PITCH_RADIANS,
                 Units.degreesToRadians(result.getBestTarget().getPitch()));
             return range;
@@ -99,7 +99,7 @@ public class ApriltagCamera extends SubsystemBase {
     public double getSpecificTargetRange(PhotonTrackedTarget target) {
         double range = PhotonUtils.calculateDistanceToTargetMeters(
             CAMERA_HEIGHT_METERS,
-            TARGET_HEIGHT_METERS,
+            TAG_HEIGHT_METERS,
             CAMERA_PITCH_RADIANS,
             Units.degreesToRadians(target.getPitch()));
         return range;

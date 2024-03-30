@@ -138,22 +138,22 @@ public class LaunchNote extends Command {
          * Configure the turning PID based on the target and gyroscope, plus an offset.
          */
         if(validTarget) {
-            /* double targetRange = Units.metersToFeet(photonvision.getSpecificTargetRange(target));
+            double targetRange = Units.metersToFeet(photonvision.getSpecificTargetRange(target));
             double targetHeight = SmartDashboard.getNumber("targetHeight", 84);
             double calculatedAngle = Units.radiansToDegrees(Math.atan(Units.inchesToMeters(targetHeight) / targetRange));
             double armSetpoint = MathUtil.clamp(
                 calculatedAngle,
                 23,
-                90); */
+                90);
             
-            double targetRange = Units.metersToFeet(PhotonUtils.getDistanceToPose(swerve.getPose(), photonvision.getSpeakerPose()));
+            /* double targetRange = Units.metersToFeet(PhotonUtils.getDistanceToPose(swerve.getPose(), photonvision.getSpeakerPose()));
             // double calculatedAngle = (0.0038 * (Math.pow(targetRange, 4))) - (0.1996 * Math.pow(targetRange, 3)) + (3.9121 * Math.pow(targetRange, 2)) - (35.256 * targetRange) + 159.93;
             double calculatedAngle = (-0.0133 * (Math.pow(targetRange, 4))) - (0.4525 * Math.pow(targetRange, 3)) + (5.1521 * Math.pow(targetRange, 2)) - (19.7495 * targetRange) + 33.698;
             double armSetpoint = MathUtil.clamp(
                 calculatedAngle,
                 23,
                 90
-                );
+                ); */
             
             SmartDashboard.putNumber("rangeToTarget", targetRange);
             SmartDashboard.putNumber("armLaunchSetpoint", calculatedAngle);

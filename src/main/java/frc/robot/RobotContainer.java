@@ -101,12 +101,6 @@ public class RobotContainer {
         SmartDashboard.putNumber("Launcher set velocity", 4500);
         SmartDashboard.putNumber("targetHeight", 84);
 
-        SmartDashboard.putNumber("armP", 0);
-        SmartDashboard.putNumber("armI", 0);
-        SmartDashboard.putNumber("armD", 0);
-
-        SmartDashboard.putNumber("setArmPosition", 23);
-
         DriverStation.silenceJoystickConnectionWarning(true);
 
         s_Swerve.setDefaultCommand(
