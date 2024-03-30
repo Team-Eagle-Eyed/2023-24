@@ -3,7 +3,6 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
@@ -29,7 +28,7 @@ public class TeleopArm extends Command {
     public void execute() {
         // Runs repeatedly after initialization
         double output = MathUtil.applyDeadband(speed.getAsDouble(), Constants.stickDeadband);
-        arm.drive(output == 0 ? (Math.cos(Units.degreesToRadians(arm.getAbsoluteEncoder().getPosition() - 180)) * 0.015) : output);
+        arm.drive(output);
     }
 
     @Override

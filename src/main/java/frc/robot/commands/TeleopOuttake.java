@@ -32,7 +32,7 @@ public class TeleopOuttake extends Command {
         if(useRPMs) {
             outtake.setOuttakeVelocity(outtakeSpeed.getAsDouble());
         } else {
-            outtake.outtake(MathUtil.applyDeadband(outtakeSpeed.getAsDouble(), Constants.stickDeadband));   
+            outtake.outtake(MathUtil.applyDeadband(outtakeSpeed.getAsDouble(), Constants.stickDeadband));
         }
     }
 

@@ -7,6 +7,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -54,6 +55,8 @@ public class Arm extends SubsystemBase {
     public void drive(double speed) {
         if ((getAbsoluteAdjustedPosition() > 175 && speed > 0) || (getAbsoluteAdjustedPosition() < 23 && speed < 0)) {
             leftMotor.set(0);
+        } else if (speed == 0) {
+            leftMotor.set(Math.cos(Units.degreesToRadians(getAbsoluteEncoder().getPosition())) * 0.015);
         } else {
             leftMotor.set(-speed);
         }

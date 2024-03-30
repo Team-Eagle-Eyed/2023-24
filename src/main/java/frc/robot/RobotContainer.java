@@ -55,6 +55,7 @@ public class RobotContainer {
     private final JoystickButton resetArm = new JoystickButton(buttonBoard, 3);
     private final JoystickButton launchNoteButtonBoard = new JoystickButton(buttonBoard, 4);
     private final JoystickButton goToNote = new JoystickButton(buttonBoard, 5);
+    private final JoystickButton ampShot = new JoystickButton(buttonBoard, 6);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -62,7 +63,7 @@ public class RobotContainer {
                                                     "Apriltag Camera",
                                                     25,
                                                     1.45,
-                                                    20
+                                                    21.75
                                                     );
     private final NoteCamera s_NoteCamera = new NoteCamera("Note Camera");
     private final Arm s_Arm = new Arm();
@@ -74,7 +75,6 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
 
-
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
 
@@ -82,6 +82,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("startIntake", new TeleopIntake(s_Intake, () -> 4000, true));
         NamedCommands.registerCommand("stopIntake", new TeleopIntake(s_Intake, () -> 0, true));
         NamedCommands.registerCommand("lowerArm", new SetArmPosition(s_Arm, () -> 23));
+        NamedCommands.registerCommand("goToNote", new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
 
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");
@@ -99,7 +100,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         SmartDashboard.putNumber("Launcher set velocity", 4500);
-        SmartDashboard.putNumber("targetHeight", 84);
+        SmartDashboard.putNumber("targetHeight", 95); // 84
 
         DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -176,6 +177,7 @@ public class RobotContainer {
         reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, () -> -0.25, false));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));
+        ampShot.whileTrue(new SetArmPosition(s_Arm, () -> 150));
         resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
         goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
         estop.whileTrue(new Estop(s_Swerve, s_Arm, s_Intake, s_Outtake));

@@ -25,13 +25,12 @@ public class SetArmPosition extends Command {
     public void initialize() {
         // Runs once on start
         positionController = new PIDController(0.03, 0.0005, 0);
-        positionController.setSetpoint(MathUtil.clamp(position.getAsDouble(), 23, 90));
+        positionController.setSetpoint(position.getAsDouble());
         positionController.setTolerance(1);
     }
     
     @Override
     public void execute() {
-
         arm.drive(MathUtil.clamp(positionController.calculate(arm.getAbsoluteAdjustedPosition()), -1, 1));
         SmartDashboard.putBoolean("armAtSetpoint", positionController.atSetpoint());
     }

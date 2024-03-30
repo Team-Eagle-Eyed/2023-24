@@ -231,7 +231,7 @@ public class Swerve extends SubsystemBase implements PositionListener {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
 
-        SmartDashboard.putNumber("Gyro", gyro.getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("Gyro", getGyroYaw().getDegrees());
         SmartDashboard.putNumber("z rotation", getPose().getRotation().getDegrees());
         field.setRobotPose(getPose());
     }

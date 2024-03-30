@@ -68,7 +68,7 @@ public class ApriltagCamera extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
-        // SmartDashboard.putNumber("rangeToTarget", Units.metersToInches(getTargetRange()));
+        SmartDashboard.putNumber("rangeToTarget", getTargetRange());
         if(getEstimatedGlobalPose().isPresent()) {
             notifyPositionUpdate(getEstimatedGlobalPose());
         }

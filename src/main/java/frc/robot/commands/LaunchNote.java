@@ -44,7 +44,8 @@ public class LaunchNote extends Command {
     private PIDController armPositionController;
 
     private double rotationSpeed = 0; // Define rotationSpeed as a default of 0
-    boolean validTarget = false; // Define validTarget as a default of false
+    boolean validTarget;
+    boolean targetPresent;
     PhotonTrackedTarget target;
 
     private Timer finishedTimer = new Timer();
@@ -67,8 +68,11 @@ public class LaunchNote extends Command {
 
     @Override
     public void initialize() {
-        finishedTimer.start();
         // Runs once on start
+
+        validTarget = false;
+        targetPresent = false;
+        finishedTimer.start();
     
         /*
          * Closed loop PID for launcher
@@ -85,34 +89,6 @@ public class LaunchNote extends Command {
         */
         turnController.setTolerance(1);
         armPositionController.setTolerance(1);
-        
-        
-        /*
-        * Logic for choosing an apriltag to use
-        */
-        PhotonPipelineResult result = photonvision.getLatestResult(); // Get latest result from photonvision
-        if(result.hasTargets()) { // if a target is acquired
-            List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
-            
-            if(targets.get(0).getFiducialId() == 4 || targets.get(0).getFiducialId() == 7) { // if the first target is 4 or 7, 
-                target = targets.get(0); // set the target to use as the first target
-                validTarget = true; // and mark as having a valid target
-            } else if (targets.size() > 1) { // otherwise if the list of targets is more than 1
-                if(targets.get(1).getFiducialId() == 4 || targets.get(1).getFiducialId() == 7) { // and if the second target is 4 or 7 (assuming the camera will only see the two targets at the same time)
-                    target = targets.get(1); // set the target to use as the second target
-                    validTarget = true; // and mark as having a valid target
-                }
-            } else { // otherwise
-                validTarget = false; // mark as having no valid target
-            }
-
-        } else { // if no target acquired
-            validTarget = false; // mark as having no valid target
-        }
-
-        if(validTarget) {
-            turnController.setSetpoint(swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15);
-        }
 
     }
 
@@ -122,40 +98,60 @@ public class LaunchNote extends Command {
         if(result.hasTargets()) { // if a target is acquired
             List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
             
+            // validTarget starts out as false
             if(targets.get(0).getFiducialId() == 4 || targets.get(0).getFiducialId() == 7) { // if the first target is 4 or 7, 
                 target = targets.get(0); // set the target to use as the first target
                 validTarget = true; // and mark as having a valid target
+                targetPresent = true;
             } else if (targets.size() > 1) { // otherwise if the list of targets is more than 1
                 if(targets.get(1).getFiducialId() == 4 || targets.get(1).getFiducialId() == 7) { // and if the second target is 4 or 7 (assuming the camera will only see the two targets at the same time)
                     target = targets.get(1); // set the target to use as the second target
                     validTarget = true; // and mark as having a valid target
+                    targetPresent = true;
                 }
             } else { // otherwise
                 // validTarget = false; // mark as having no valid target
+                targetPresent = false;
+                // Don't revoke the existing target, we only want to update it with a new one if it's available.
             }
+        } else {
+            targetPresent = false;
         }
+
         /*
-         * Configure the turning PID based on the target and gyroscope, plus an offset.
+         * Configure rotation PID based on latest apriltag result
+         */
+        if(validTarget && targetPresent) {
+            double turnSetpoint = swerve.getGyroYaw().getDegrees() - target.getYaw() + 2.15;
+            SmartDashboard.putNumber("launchNoteTurnSetpoint", turnSetpoint);
+            turnController.setSetpoint(turnSetpoint);
+        }
+
+        /*
+         * Configure the arm PID based on the distance calculations.
          */
         if(validTarget) {
-            double targetRange = Units.metersToFeet(photonvision.getSpecificTargetRange(target));
-            double targetHeight = SmartDashboard.getNumber("targetHeight", 84);
+            // Old math (Distance in meters)
+            double targetRange = photonvision.getSpecificTargetRange(target);
+            /* double targetHeight = SmartDashboard.getNumber("targetHeight", 84);
             double calculatedAngle = Units.radiansToDegrees(Math.atan(Units.inchesToMeters(targetHeight) / targetRange));
             double armSetpoint = MathUtil.clamp(
                 calculatedAngle,
                 23,
-                90);
+                90); */
             
-            /* double targetRange = Units.metersToFeet(PhotonUtils.getDistanceToPose(swerve.getPose(), photonvision.getSpeakerPose()));
+            // New math (Distance in feet)
+            // double targetRange = Units.metersToFeet(PhotonUtils.getDistanceToPose(swerve.getPose(), photonvision.getSpeakerPose()));
             // double calculatedAngle = (0.0038 * (Math.pow(targetRange, 4))) - (0.1996 * Math.pow(targetRange, 3)) + (3.9121 * Math.pow(targetRange, 2)) - (35.256 * targetRange) + 159.93;
-            double calculatedAngle = (-0.0133 * (Math.pow(targetRange, 4))) - (0.4525 * Math.pow(targetRange, 3)) + (5.1521 * Math.pow(targetRange, 2)) - (19.7495 * targetRange) + 33.698;
+            // double calculatedAngle = (-0.0133 * (Math.pow(targetRange, 4))) - (0.4525 * Math.pow(targetRange, 3)) + (5.1521 * Math.pow(targetRange, 2)) - (19.7495 * targetRange) + 33.698;
+            double calculatedAngle = (2.9873 * (Math.pow(targetRange, 2))) - (30.058 * targetRange) + 100.453;
             double armSetpoint = MathUtil.clamp(
                 calculatedAngle,
                 23,
                 90
-                ); */
+                );
             
-            SmartDashboard.putNumber("rangeToTarget", targetRange);
+            // SmartDashboard.putNumber("rangeToTarget", targetRange);
             SmartDashboard.putNumber("armLaunchSetpoint", calculatedAngle);
             armPositionController.setSetpoint(armSetpoint);
         }
