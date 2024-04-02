@@ -54,7 +54,11 @@ public class Intake extends SubsystemBase {
 
     public void setIntakeVelocity(double velocity) {
         if (noteSensor.get()) {
-            getIntakePID().setReference(velocity, ControlType.kVelocity);
+            if(!secondaryNoteSensor.get()) {
+                getIntakePID().setReference(velocity * 0.5, ControlType.kVelocity);    
+            } else {
+                getIntakePID().setReference(velocity, ControlType.kVelocity);
+            }
         } else if (!noteSensor.get()){
             intakeBottom.set(-0.25);
         } else {

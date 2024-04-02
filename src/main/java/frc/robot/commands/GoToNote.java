@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import javax.lang.model.util.ElementScanner14;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +19,7 @@ public class GoToNote extends Command {
     private PIDController driveController;
 
     private boolean noteCentered;
+    private double finishedCount;
 
     public GoToNote(Swerve m_swerve, Intake m_intake, NoteCamera m_NoteCamera) {
         addRequirements(m_swerve, m_intake);
@@ -30,13 +33,13 @@ public class GoToNote extends Command {
         // Runs once on start
         strafeController = new PIDController(0.05, 0, 0);
         strafeController.setSetpoint(0);
-        strafeController.setTolerance(3);
+        strafeController.setTolerance(2);
 
         driveController = new PIDController(0.2, 0, 0);
-        driveController.setSetpoint(-10);
-        driveController.setTolerance(3);
-
+        driveController.setSetpoint(-15);
+        driveController.setTolerance(10);
         noteCentered = false;
+        finishedCount = 0;
     }
 
     @Override
@@ -56,11 +59,13 @@ public class GoToNote extends Command {
         } else {
             strafeOutput = 0;
         }
-        if(strafeController.atSetpoint() && driveController.atSetpoint()) {
+        if(strafeController.atSetpoint()/*  && driveController.atSetpoint() */) {
             noteCentered = true;
         }
-        if(noteCentered == true) {
+        if(noteCentered == true && m_intake.getSecondaryNoteSensor().get()) {
             translationOutput = 2;
+        } else if (!m_intake.getSecondaryNoteSensor().get()) {
+            translationOutput = 0;
         }
         m_swerve.drive(
             new Translation2d(translationOutput, strafeOutput),
@@ -68,11 +73,23 @@ public class GoToNote extends Command {
             false,
             true
         );
-        if(noteCentered == true) {
+
+        boolean intakeSensorTripped = !m_intake.getNoteSensor().get();
+        boolean outtakeSensorTripped = !m_intake.getSecondaryNoteSensor().get();
+        if(noteCentered == true && !(!intakeSensorTripped && outtakeSensorTripped)) {
             m_intake.setIntakeVelocity(4000);
+        } else if (!intakeSensorTripped && outtakeSensorTripped) {
+            finishedCount = finishedCount + 1;
+            m_intake.setIntakeVelocity(0);
         } else {
-            m_intake.intake(0);
+            m_intake.setIntakeVelocity(0);
         }
+
+        /* if(m_intake.getNoteSensor().get() && !m_intake.getSecondaryNoteSensor().get()) {
+            finishedCount = finishedCount + 1;
+            m_intake.setIntakeVelocity(0);
+        } */
+
     }
 
     @Override
@@ -86,7 +103,13 @@ public class GoToNote extends Command {
 
     @Override
     public boolean isFinished() {
-        return !m_intake.getNoteSensor().get();
+        // return (m_intake.getNoteSensor().get() && !m_intake.getSecondaryNoteSensor().get());
+        return finishedCount > 10;
+        // I set a flag that the first sensor was tripped then set it to reverse
+        //did not work. Still finished with the note in the shooter.
+        //
+        //return !m_intake.getNoteSensor().get(); // Brian, I am trying using the other sensor to 
+        // stop it from finishing with the note jammed into the shooter wheels... Did not work.
         // Whether or not the command is finished
     }
 }

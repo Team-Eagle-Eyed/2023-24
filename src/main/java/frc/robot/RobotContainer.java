@@ -57,6 +57,8 @@ public class RobotContainer {
     private final JoystickButton goToNote = new JoystickButton(buttonBoard, 5);
     private final JoystickButton ampShot = new JoystickButton(buttonBoard, 6);
 
+    private final JoystickButton alignRobot = new JoystickButton(buttonBoard, 7);
+
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final ApriltagCamera s_ApriltagCamera = new ApriltagCamera(
@@ -78,11 +80,16 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
 
-        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_ApriltagCamera, () -> 4500));
+        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_ApriltagCamera, () -> SmartDashboard.getNumber("Launcher set velocity", 4500)));
         NamedCommands.registerCommand("startIntake", new TeleopIntake(s_Intake, () -> 4000, true));
         NamedCommands.registerCommand("stopIntake", new TeleopIntake(s_Intake, () -> 0, true));
         NamedCommands.registerCommand("lowerArm", new SetArmPosition(s_Arm, () -> 23));
         NamedCommands.registerCommand("goToNote", new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
+        NamedCommands.registerCommand("alignForAuto", new TurnToAngle(
+            s_Swerve,
+            DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 90 : -90
+            ));
+        NamedCommands.registerCommand("alignForShot", new TurnToAngle(s_Swerve, 0));
 
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");
@@ -181,6 +188,8 @@ public class RobotContainer {
         resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
         goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
         estop.whileTrue(new Estop(s_Swerve, s_Arm, s_Intake, s_Outtake));
+
+        alignRobot.whileTrue(new TurnToAngle(s_Swerve, 0));
     }
 
     /**
