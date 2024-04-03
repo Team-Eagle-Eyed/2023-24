@@ -69,9 +69,10 @@ public class ApriltagCamera extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
         SmartDashboard.putNumber("rangeToTarget", getTargetRange());
-        if(getEstimatedGlobalPose().isPresent()) {
+        // Removed vision contribution to pose estimation.
+        /* if(getEstimatedGlobalPose().isPresent()) {
             notifyPositionUpdate(getEstimatedGlobalPose());
-        }
+        } */
     }
 
     public PhotonPipelineResult getLatestResult() {
