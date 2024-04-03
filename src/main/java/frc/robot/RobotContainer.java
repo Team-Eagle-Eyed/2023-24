@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -56,8 +57,6 @@ public class RobotContainer {
     private final JoystickButton launchNoteButtonBoard = new JoystickButton(buttonBoard, 4);
     private final JoystickButton goToNote = new JoystickButton(buttonBoard, 5);
     private final JoystickButton ampShot = new JoystickButton(buttonBoard, 6);
-
-    private final JoystickButton alignRobot = new JoystickButton(buttonBoard, 7);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -184,12 +183,10 @@ public class RobotContainer {
         reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, () -> -0.25, false));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));
-        ampShot.whileTrue(new SetArmPosition(s_Arm, () -> 150));
+        ampShot.whileTrue(new AmpShot(s_Arm, s_Intake, s_Outtake));
         resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
         goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
-        estop.whileTrue(new Estop(s_Swerve, s_Arm, s_Intake, s_Outtake));
-
-        alignRobot.whileTrue(new TurnToAngle(s_Swerve, 0));
+        estop.whileTrue(new Estop(null));
     }
 
     /**

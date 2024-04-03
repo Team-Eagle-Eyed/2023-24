@@ -32,7 +32,7 @@ public class LaunchNote extends Command {
     private Swerve swerve;
     private Arm arm;
 
-    private double ANGULAR_P = 0.15;
+    private double ANGULAR_P = 0.1; // 0.15
     private double ANGULAR_I = 0.3;
     private double ANGULAR_D = 0;
 
@@ -87,7 +87,7 @@ public class LaunchNote extends Command {
         /*
         * Configure arm and rotation PID controllers
         */
-        turnController.setTolerance(1);
+        turnController.setTolerance(2);
         armPositionController.setTolerance(1);
 
     }
@@ -221,6 +221,7 @@ public class LaunchNote extends Command {
         SmartDashboard.putBoolean("launcherAtSpeed", launcherAtSpeed);
         SmartDashboard.putBoolean("rotationAtSetpoint", turnController.atSetpoint());
         SmartDashboard.putBoolean("armAtSetpoint", armPositionController.atSetpoint());
+        SmartDashboard.putBoolean("launchingNote", launcherAtSpeed && turnController.atSetpoint() && armPositionController.atSetpoint() && validTarget == true);
     }
 
     @Override
@@ -234,7 +235,7 @@ public class LaunchNote extends Command {
 
     @Override
     public boolean isFinished() {
-        if(finishedTimer.get() > 1) {
+        if(finishedTimer.get() > 0.25) {
             return true;
         } else {
             return false;
