@@ -52,7 +52,7 @@ public class AmpShot extends Command {
         launcher.getOuttakePID().setOutputRange(0, 1);
 
         armPositionController.setTolerance(1);
-        armPositionController.setSetpoint(137);
+        armPositionController.setSetpoint(132);
 
     }
 

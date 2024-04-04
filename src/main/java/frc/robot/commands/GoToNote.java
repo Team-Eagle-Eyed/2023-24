@@ -4,6 +4,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.NoteCamera;
@@ -21,6 +22,8 @@ public class GoToNote extends Command {
     private boolean noteCentered;
     private boolean targetAcquired;
     private double finishedCount;
+
+    private Timer finishedTimer;
 
     private PhotonTrackedTarget target;
 
@@ -44,6 +47,7 @@ public class GoToNote extends Command {
         noteCentered = false;
         targetAcquired = false;
         finishedCount = 0;
+        finishedTimer.start();
     }
 
     @Override
@@ -79,6 +83,8 @@ public class GoToNote extends Command {
             translationOutput = 2;
         } else if (!m_intake.getSecondaryNoteSensor().get()) {
             translationOutput = 0;
+        } else {
+            finishedTimer.reset();
         }
         m_swerve.drive(
             new Translation2d(translationOutput, 0),
@@ -117,7 +123,7 @@ public class GoToNote extends Command {
     @Override
     public boolean isFinished() {
         // return (m_intake.getNoteSensor().get() && !m_intake.getSecondaryNoteSensor().get());
-        return finishedCount > 1;
+        return finishedCount > 1 || finishedTimer.get() > 1.5;
         // I set a flag that the first sensor was tripped then set it to reverse
         //did not work. Still finished with the note in the shooter.
         //

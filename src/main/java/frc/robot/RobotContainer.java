@@ -86,9 +86,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("goToNote", new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
         NamedCommands.registerCommand("alignForAuto", new TurnToAngle(
             s_Swerve,
-            DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 90 : -90
+            () -> {
+                if(DriverStation.getAlliance().isPresent()) {
+                    return DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 90 : -90;
+                } else {
+                    return 90;
+                }}
             ));
-        NamedCommands.registerCommand("alignForShot", new TurnToAngle(s_Swerve, 0));
+        NamedCommands.registerCommand("alignForShot", new TurnToAngle(s_Swerve, () -> 0));
 
         musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");
@@ -186,7 +191,6 @@ public class RobotContainer {
         ampShot.whileTrue(new AmpShot(s_Arm, s_Intake, s_Outtake));
         resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
         goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
-        estop.whileTrue(new Estop(null));
     }
 
     /**
