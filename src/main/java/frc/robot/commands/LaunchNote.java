@@ -33,7 +33,7 @@ public class LaunchNote extends Command {
     private Arm arm;
 
     private double ANGULAR_P = 0.1; // 0.15
-    private double ANGULAR_I = 0.1; // 0.3
+    private double ANGULAR_I = 0.2; // 0.3
     private double ANGULAR_D = 0;
 
     private double ARM_P = 0.03;

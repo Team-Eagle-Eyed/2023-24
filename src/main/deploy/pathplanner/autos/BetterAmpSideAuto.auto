@@ -2,15 +2,27 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3571648195927977,
-      "y": 5.555162990025228
+      "x": 0.4518789989960938,
+      "y": 7.345159953477801
     },
-    "rotation": -0.2569300245035309
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 7.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BetterAmpSidePath"
+          }
+        },
         {
           "type": "race",
           "data": {
@@ -35,31 +47,37 @@
           "data": {
             "commands": [
               {
-                "type": "race",
+                "type": "path",
+                "data": {
+                  "pathName": "LineUpTo4"
+                }
+              },
+              {
+                "type": "deadline",
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
+                      "type": "wait",
                       "data": {
-                        "name": "goToNote"
+                        "waitTime": 1.0
                       }
                     },
                     {
-                      "type": "wait",
+                      "type": "named",
                       "data": {
-                        "waitTime": 2.0
+                        "name": "lowerArm"
                       }
                     }
                   ]
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "lowerArm"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BASAReturnToShoot"
           }
         },
         {

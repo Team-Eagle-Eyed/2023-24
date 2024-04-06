@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.663656856135768,
-        "y": 5.2156808073014655
+        "x": 3.4866439657691353,
+        "y": 6.316426066436093
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9809456234147236,
-        "y": 4.884974553471896
+        "x": 4.486643965769135,
+        "y": 6.316426066436093
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BetterAmpSidePath"
     },
     {
       "anchor": {
-        "x": 1.5977715367753011,
-        "y": 4.143554827394014
+        "x": 7.015201198322196,
+        "y": 7.38630930895947
       },
       "prevControl": {
-        "x": 1.2865185919945297,
-        "y": 4.464534426699184
+        "x": 6.015201198322196,
+        "y": 7.38630930895947
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LineUpTo4End"
     }
   ],
   "rotationTargets": [],
@@ -43,9 +43,9 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "BetterAmpSideAuto",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 20.95577673063223,
     "velocity": 0
   },
   "useDefaultConstraints": true

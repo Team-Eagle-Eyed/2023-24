@@ -23,8 +23,6 @@ public class GoToNote extends Command {
     private boolean targetAcquired;
     private double finishedCount;
 
-    private Timer finishedTimer;
-
     private PhotonTrackedTarget target;
 
     public GoToNote(Swerve m_swerve, Intake m_intake, NoteCamera m_NoteCamera) {
@@ -47,7 +45,6 @@ public class GoToNote extends Command {
         noteCentered = false;
         targetAcquired = false;
         finishedCount = 0;
-        finishedTimer.start();
     }
 
     @Override
@@ -83,9 +80,8 @@ public class GoToNote extends Command {
             translationOutput = 2;
         } else if (!m_intake.getSecondaryNoteSensor().get()) {
             translationOutput = 0;
-        } else {
-            finishedTimer.reset();
         }
+
         m_swerve.drive(
             new Translation2d(translationOutput, 0),
             turnOutput,
@@ -96,7 +92,7 @@ public class GoToNote extends Command {
         boolean intakeSensorTripped = !m_intake.getNoteSensor().get();
         boolean outtakeSensorTripped = !m_intake.getSecondaryNoteSensor().get();
         if(noteCentered == true && !(!intakeSensorTripped && outtakeSensorTripped)) {
-            m_intake.setIntakeVelocity(2700);
+            m_intake.setIntakeVelocity(2500);
         } else if (!intakeSensorTripped && outtakeSensorTripped) {
             finishedCount = finishedCount + 1;
             m_intake.setIntakeVelocity(0);
@@ -123,7 +119,7 @@ public class GoToNote extends Command {
     @Override
     public boolean isFinished() {
         // return (m_intake.getNoteSensor().get() && !m_intake.getSecondaryNoteSensor().get());
-        return finishedCount > 1 || finishedTimer.get() > 1.5;
+        return finishedCount > 1;
         // I set a flag that the first sensor was tripped then set it to reverse
         //did not work. Still finished with the note in the shooter.
         //

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.663656856135768,
-        "y": 5.2156808073014655
+        "x": 6.8197417597842716,
+        "y": 4.032636837203499
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9809456234147236,
-        "y": 4.884974553471896
+        "x": 5.924743278057985,
+        "y": 4.0840735315555845
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LineUpTo6End"
     },
     {
       "anchor": {
-        "x": 1.5977715367753011,
-        "y": 4.143554827394014
+        "x": 4.896009391016276,
+        "y": 4.0532115149443335
       },
       "prevControl": {
-        "x": 1.2865185919945297,
-        "y": 4.464534426699184
+        "x": 5.173767540517537,
+        "y": 4.0429241760739165
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BSSAReturnToCenterStageEnd"
     }
   ],
   "rotationTargets": [],
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "BetterSourceSideAuto",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

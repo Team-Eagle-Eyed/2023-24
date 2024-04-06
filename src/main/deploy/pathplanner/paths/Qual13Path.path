@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.663656856135768,
-        "y": 5.2156808073014655
+        "x": 0.49302835447776205,
+        "y": 2.0677551129538356
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9809456234147236,
-        "y": 4.884974553471896
+        "x": 1.493028354477763,
+        "y": 2.0677551129538356
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.5977715367753011,
-        "y": 4.143554827394014
+        "x": 3.3631958993241295,
+        "y": 3.0039029501617907
       },
       "prevControl": {
-        "x": 1.2865185919945297,
-        "y": 4.464534426699184
+        "x": 2.0669912016515766,
+        "y": 2.396949956807182
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Qual13Auto"
     }
   ],
   "rotationTargets": [],
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -32.22875743509861,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Qual13Auto",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
