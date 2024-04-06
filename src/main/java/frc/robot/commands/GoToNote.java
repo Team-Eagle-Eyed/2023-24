@@ -4,7 +4,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.NoteCamera;
@@ -35,7 +34,7 @@ public class GoToNote extends Command {
     @Override
     public void initialize() {
         // Runs once on start
-        turnController = new PIDController(0.1, 0, 0);
+        turnController = new PIDController(0.075, 0, 0);
         turnController.setSetpoint(0);
         turnController.setTolerance(0.5);
 
@@ -70,6 +69,7 @@ public class GoToNote extends Command {
         }
         if(targetAcquired) {
             turnOutput = turnController.calculate(m_swerve.getHeading().getDegrees());
+            // turnOutput = turnController.calculate(target.getYaw());
         } else {
             turnOutput = 0;
         }
@@ -77,7 +77,7 @@ public class GoToNote extends Command {
             noteCentered = true;
         }
         if(noteCentered == true && m_intake.getSecondaryNoteSensor().get()) {
-            translationOutput = 2;
+            translationOutput = 1;
         } else if (!m_intake.getSecondaryNoteSensor().get()) {
             translationOutput = 0;
         }

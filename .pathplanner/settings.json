@@ -5,10 +5,11 @@
   "pathFolders": [
     "BetterAmpSideAuto",
     "BetterSourceSideAuto",
+    "Qual74Auto",
     "Qual13Auto"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 3.0,
+  "defaultMaxVel": 4.5,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

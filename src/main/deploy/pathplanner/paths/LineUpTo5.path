@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4866439657691353,
-        "y": 3.014190289032207
+        "x": 2.9105529890257786,
+        "y": 3.209649727570132
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.638825919255849,
-        "y": 3.5285572325530614
+        "x": 3.939286876067486,
+        "y": 2.7878688338830315
       },
       "isLocked": false,
       "linkedName": "BetterSourceSidePath"
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0

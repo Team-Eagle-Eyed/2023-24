@@ -20,6 +20,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -203,6 +204,15 @@ public class Swerve extends SubsystemBase implements PositionListener {
         return getPose().getRotation();
     }
 
+    /**
+     * Gets degree heading wrapped to -180-180
+     * @return Heading in degrees
+     * 
+     */
+    public double getHeadingModulus() {
+        return MathUtil.inputModulus(getHeading().getDegrees(), -180, 180);
+    }
+
     public void setHeading(Rotation2d heading){
         mPoseEstimator.resetPosition(getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
     }
@@ -230,9 +240,6 @@ public class Swerve extends SubsystemBase implements PositionListener {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
-
-        SmartDashboard.putNumber("Gyro", getGyroYaw().getDegrees());
-        SmartDashboard.putNumber("z rotation", getPose().getRotation().getDegrees());
         field.setRobotPose(getPose());
     }
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5033156933481789,
-        "y": 4.156084903648504
+        "x": 2.8796909724145268,
+        "y": 3.2610864219222173
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5033156933481786,
-        "y": 4.156084903648504
+        "x": 3.8796909724145268,
+        "y": 3.2610864219222173
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Qual74Path"
     },
     {
       "anchor": {
-        "x": 2.9002656501553608,
-        "y": 2.9730409335505392
+        "x": 7.292959347823457,
+        "y": 0.7921250930221164
       },
       "prevControl": {
-        "x": 1.9002656501553608,
-        "y": 2.9730409335505392
+        "x": 6.292959347823457,
+        "y": 0.7921250930221164
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -37.405356631408544,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Qual74Auto",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
