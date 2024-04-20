@@ -61,15 +61,15 @@ public class RobotContainer {
     private final JoystickButton playMusic = new JoystickButton(buttonBoard, 10);
 
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
     private final ApriltagCamera s_ApriltagCamera = new ApriltagCamera(
                                                     "Apriltag Camera",
                                                     25,
                                                     1.45,
                                                     21.75
                                                     );
+    private final Swerve s_Swerve = new Swerve(s_ApriltagCamera);
     private final NoteCamera s_NoteCamera = new NoteCamera("Note Camera");
-    private final Arm s_Arm = new Arm();
+    private final Arm s_Arm = new Arm(s_ApriltagCamera);
     private final Intake s_Intake = new Intake();
     private final Outtake s_Outtake = new Outtake();
 
@@ -81,7 +81,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
 
-        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_ApriltagCamera, () -> SmartDashboard.getNumber("Launcher set velocity", 4500)));
+        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Outtake, s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 4500)));
         NamedCommands.registerCommand("startIntake", new TeleopIntake(s_Intake, () -> 4000, true));
         NamedCommands.registerCommand("stopIntake", new TeleopIntake(s_Intake, () -> 0, true));
         NamedCommands.registerCommand("lowerArm", new SetArmPosition(s_Arm, () -> 23));
@@ -120,6 +120,7 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
+                s_Intake,
                 s_ApriltagCamera,
                 () -> -driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
                 () -> -driver.getRawAxis(strafeAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
@@ -132,6 +133,7 @@ public class RobotContainer {
         s_Arm.setDefaultCommand(
             new TeleopArm(
                 s_Arm,
+                s_Intake,
                 () -> -operator.getRawAxis(armAxis)
             )
         );
@@ -169,20 +171,14 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         driverIntake.whileTrue(new TeleopIntake(s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 4000), true));
         launchNote.whileTrue(new LaunchNote(
-                                    s_Swerve,
-                                    s_Arm,
                                     s_Outtake,
                                     s_Intake,
-                                    s_ApriltagCamera,
                                     () -> SmartDashboard.getNumber("Launcher set velocity", 4050)
                                     )
                                 );
         launchNoteButtonBoard.whileTrue(new LaunchNote(
-                                    s_Swerve,
-                                    s_Arm,
                                     s_Outtake,
                                     s_Intake,
-                                    s_ApriltagCamera,
                                     () -> SmartDashboard.getNumber("Launcher set velocity", 4050)
                                     )
                                 );
@@ -192,9 +188,10 @@ public class RobotContainer {
         raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));
         ampShot.whileTrue(new AmpShot(s_Arm, s_Intake, s_Outtake));
         relayShot.whileTrue(new RelayShot(s_Swerve, s_Arm, s_Intake, s_Outtake));
-        resetArm.whileTrue(new TeleopArm(s_Arm, () -> -0.2));
+        resetArm.whileTrue(new TeleopArm(s_Arm, s_Intake, () -> -0.2));
         goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
         playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
+        estop.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
     }
 
     /**

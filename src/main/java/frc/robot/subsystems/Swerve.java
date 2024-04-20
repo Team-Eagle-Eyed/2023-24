@@ -36,15 +36,22 @@ public class Swerve extends SubsystemBase implements PositionListener {
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
 
+    private ApriltagCamera camera;
+
     private Field2d field;
 
-    public Swerve() {
+    public boolean hasOptimalAngle = false;
+    public double optimalAngle = 0;
+
+    public Swerve(ApriltagCamera camera) {
         gyro = new Pigeon2(Constants.Swerve.pigeonID, "CANivore");
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
         field = new Field2d();
         SmartDashboard.putData("Field", field);
+
+        this.camera = camera;
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -71,7 +78,10 @@ public class Swerve extends SubsystemBase implements PositionListener {
                     Constants.Swerve.maxSpeed, // Max module speed, in m/s
                     //TODO: Check math below
                     Math.sqrt(Math.pow(Constants.Swerve.trackWidth, 2) + Math.pow(Constants.Swerve.wheelBase, 2)), // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+                    new ReplanningConfig(
+                        true,
+                        true
+                        ) // Default path replanning config. See the API for the options here
             ),
             () -> {
               // Boolean supplier that controls when the path will be mirrored for the red alliance
@@ -234,6 +244,13 @@ public class Swerve extends SubsystemBase implements PositionListener {
     @Override
     public void periodic(){
         mPoseEstimator.update(getGyroYaw(), getModulePositions());
+
+        if(camera.targetAngle.isPresent()) {
+            optimalAngle = getHeading().getDegrees() - camera.targetAngle.get() + 2.15;
+            hasOptimalAngle = true;
+        } else {
+            hasOptimalAngle = false;
+        }
 
         for(SwerveModule mod : mSwerveMods) {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());

@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -39,6 +39,9 @@ public class ApriltagCamera extends SubsystemBase {
     private PhotonPoseEstimator estimator;
 
     private final List<PositionListener> listeners = new ArrayList<>();
+
+    public Optional<Double> rangeToSpeaker;
+    public Optional<Double> targetAngle;
 
     public ApriltagCamera(String cameraID, double CAMERA_HEIGHT_INCHES, double TAG_HEIGHT_METERS, double CAMERA_PITCH_DEGREES) {
         this.camera = new PhotonCamera(cameraID);
@@ -73,10 +76,47 @@ public class ApriltagCamera extends SubsystemBase {
         /* if(getEstimatedGlobalPose().isPresent()) {
             notifyPositionUpdate(getEstimatedGlobalPose());
         } */
+        updateGlobalVariables();
     }
 
     public PhotonPipelineResult getLatestResult() {
         return camera.getLatestResult();
+    }
+
+    private Optional<PhotonTrackedTarget> getSpeakerTag() {
+        PhotonPipelineResult result = getLatestResult();
+        if(result.hasTargets()) {
+            List<PhotonTrackedTarget> targets = result.getTargets(); // get list of targets
+            PhotonTrackedTarget target;
+            // validTarget starts out as false
+            if(targets.get(0).getFiducialId() == 4 || targets.get(0).getFiducialId() == 7) { // if the first target is 4 or 7, 
+                target = targets.get(0); // set the target to use as the first target
+                return Optional.of(target);
+            } else if (targets.size() > 1) { // otherwise if the list of targets is more than 1
+                if(targets.get(1).getFiducialId() == 4 || targets.get(1).getFiducialId() == 7) { // and if the second target is 4 or 7 (assuming the camera will only see the two targets at the same time)
+                    target = targets.get(1); // set the target to use as the second target
+                    return Optional.of(target);
+                } else {
+                    return Optional.empty();
+                }
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private void updateGlobalVariables() {
+        if(getSpeakerTag().isPresent()) {
+            PhotonTrackedTarget target = getSpeakerTag().get();
+            rangeToSpeaker = Optional.of(getSpecificTargetRange(target));
+            targetAngle = Optional.of(target.getYaw());
+        } else {
+            rangeToSpeaker = Optional.empty();
+            targetAngle = Optional.empty();
+        }
+
     }
 
     public double getTargetRange() {
