@@ -12,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 
@@ -42,7 +43,7 @@ public class TeleopSwerve extends Command {
 
     @Override
     public void initialize() {
-        rotationController = new PIDController(0.02, 0, 0); // 0.3 I?
+        rotationController = new PIDController(0.02, 0, 0.001); // 0.3 I?
         rotationController.setTolerance(0.5);
         timer.start();
     }
@@ -69,6 +70,8 @@ public class TeleopSwerve extends Command {
                 rotationVal = 0;
             }
         }
+        s_Swerve.rotationAtSetpoint = rotationController.atSetpoint();
+
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed), 
             rotationVal * Constants.Swerve.maxAngularVelocity, 

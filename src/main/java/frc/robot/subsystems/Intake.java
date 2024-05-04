@@ -15,24 +15,19 @@ public class Intake extends SubsystemBase {
 
     private final CANSparkMax intakeBottom = new CANSparkMax(10, MotorType.kBrushless);
     private final CANSparkMax intakeTop = new CANSparkMax(11, MotorType.kBrushless);
-    private final DigitalInput noteSensor = new DigitalInput(0);
-    private final DigitalInput secondaryNoteSensor = new DigitalInput(1);
-    private final PowerDistribution pdh = new PowerDistribution();
+    private DigitalInput noteSensor;
+    private DigitalInput secondaryNoteSensor;
 
-    public Intake() {
+    public Intake(DigitalInput noteSensor, DigitalInput secondaryNoteSensor) {
         // Runs when calling new Launcher()
+        this.noteSensor = noteSensor;
+        this.secondaryNoteSensor = secondaryNoteSensor;
         configureMotors();
-        pdh.setSwitchableChannel(true);
     }
 
     @Override
     public void periodic() {
         // Stuff to run repeatedly
-        if(!getNoteSensor().get() || !getSecondaryNoteSensor().get()) {
-            pdh.setSwitchableChannel(true);
-        } else {
-            pdh.setSwitchableChannel(false);
-        }
     }
 
     private void configureMotors() {

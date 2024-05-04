@@ -54,6 +54,8 @@ public class TeleopArm extends Command {
         } else if (timer.get() > 1 && intake.getSecondaryNoteSensor().get()) {
             arm.drive(-0.2);
         }
+        
+        arm.atSetpoint = positionController.atSetpoint();
     }
 
     @Override

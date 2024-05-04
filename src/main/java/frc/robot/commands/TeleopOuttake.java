@@ -3,20 +3,24 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
 
 
 public class TeleopOuttake extends Command {
 
     private Outtake outtake;
+    private Intake intake;
     private DoubleSupplier outtakeSpeed;
     private Boolean useRPMs;
 
-    public TeleopOuttake(Outtake outtake, DoubleSupplier outtakeSpeed, Boolean useRPMs) {
+    public TeleopOuttake(Outtake outtake, Intake intake, DoubleSupplier outtakeSpeed, Boolean useRPMs) {
         addRequirements(outtake);
         this.outtake = outtake;
+        this.intake = intake;
         this.outtakeSpeed = outtakeSpeed;
         this.useRPMs = useRPMs;
     }
@@ -30,7 +34,11 @@ public class TeleopOuttake extends Command {
     public void execute() {
         // Runs repeatedly after initialization
         if(useRPMs) {
-            outtake.setOuttakeVelocity(outtakeSpeed.getAsDouble());
+            if(!intake.getSecondaryNoteSensor().get()) {
+                outtake.setOuttakeVelocity(outtakeSpeed.getAsDouble());
+            } else {
+                outtake.outtake(0);
+            }
         } else {
             outtake.outtake(MathUtil.applyDeadband(outtakeSpeed.getAsDouble(), Constants.stickDeadband));
         }

@@ -3,17 +3,17 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -58,30 +58,42 @@ public class RobotContainer {
     private final JoystickButton goToNote = new JoystickButton(buttonBoard, 5);
     private final JoystickButton ampShot = new JoystickButton(buttonBoard, 6);
     private final JoystickButton relayShot = new JoystickButton(buttonBoard, 7);
-    private final JoystickButton playMusic = new JoystickButton(buttonBoard, 10);
+    
+    /* Sensors */
+    private final DigitalInput noteSensor = new DigitalInput(0);
+    private final DigitalInput secondaryNoteSensor = new DigitalInput(1);
 
     /* Subsystems */
     private final ApriltagCamera s_ApriltagCamera = new ApriltagCamera(
                                                     "Apriltag Camera",
-                                                    25,
+                                                    25.25,
                                                     1.45,
-                                                    21.75
+                                                    25 // 21.75
                                                     );
     private final Swerve s_Swerve = new Swerve(s_ApriltagCamera);
     private final NoteCamera s_NoteCamera = new NoteCamera("Note Camera");
     private final Arm s_Arm = new Arm(s_ApriltagCamera);
-    private final Intake s_Intake = new Intake();
+    private final Intake s_Intake = new Intake(noteSensor, secondaryNoteSensor);
     private final Outtake s_Outtake = new Outtake();
+    private final Lights s_Lights = new Lights(s_Swerve, s_Arm, s_Intake, s_Outtake);
 
     /* Sendable Choosers */
     private final SendableChooser<String> musicSelector = new SendableChooser<>();
     private final SendableChooser<Command> autoChooser;
 
+    /* Triggers */
+
+    private final Trigger slowIntakeTrigger = new Trigger(() -> !secondaryNoteSensor.get());
+    private final Trigger operatorRunIntake = new Trigger(() -> operator.getRawAxis(intakeAxis) > 0.1);
+
+    /* Multipliers */
+    private double intakeMultiplier;
+
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
 
-        NamedCommands.registerCommand("launchNote", new LaunchNote(s_Outtake, s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 4500)));
+        NamedCommands.registerCommand("launchNote", new AutonomousLaunchNote(s_Swerve, s_Arm, s_Outtake, s_Intake, s_ApriltagCamera, () -> SmartDashboard.getNumber("Launcher set velocity", 4500)));
         NamedCommands.registerCommand("startIntake", new TeleopIntake(s_Intake, () -> 4000, true));
         NamedCommands.registerCommand("stopIntake", new TeleopIntake(s_Intake, () -> 0, true));
         NamedCommands.registerCommand("lowerArm", new SetArmPosition(s_Arm, () -> 23));
@@ -117,6 +129,8 @@ public class RobotContainer {
 
         DriverStation.silenceJoystickConnectionWarning(true);
 
+        intakeMultiplier = 1;
+
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
@@ -141,7 +155,7 @@ public class RobotContainer {
         s_Intake.setDefaultCommand(
             new TeleopIntake(
                 s_Intake,
-                () -> operator.getRawAxis(intakeAxis) * 4000,
+                () -> 0,
                 true
             )
         );
@@ -149,7 +163,8 @@ public class RobotContainer {
         s_Outtake.setDefaultCommand(
             new TeleopOuttake(
                 s_Outtake,
-                () -> operator.getRawAxis(outtakeAxis) * SmartDashboard.getNumber("Launcher set velocity", 1),
+                s_Intake,
+                () -> SmartDashboard.getNumber("Launcher set velocity", 4500),
                 true
             )
         );
@@ -169,29 +184,35 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-        driverIntake.whileTrue(new TeleopIntake(s_Intake, () -> SmartDashboard.getNumber("Launcher set velocity", 4000), true));
+        driverIntake.whileTrue(new TeleopIntake(s_Intake, () -> 4000 * intakeMultiplier, true));
         launchNote.whileTrue(new LaunchNote(
-                                    s_Outtake,
+                                    s_Swerve,
                                     s_Intake,
-                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4050)
+                                    s_Outtake,
+                                    s_Arm
                                     )
                                 );
         launchNoteButtonBoard.whileTrue(new LaunchNote(
-                                    s_Outtake,
+                                    s_Swerve,
                                     s_Intake,
-                                    () -> SmartDashboard.getNumber("Launcher set velocity", 4050)
+                                    s_Outtake,
+                                    s_Arm
                                     )
                                 );
         reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.5, false));
-        reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, () -> -0.25, false));
+        reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, s_Intake, () -> -0.25, false));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));
         ampShot.whileTrue(new AmpShot(s_Arm, s_Intake, s_Outtake));
         relayShot.whileTrue(new RelayShot(s_Swerve, s_Arm, s_Intake, s_Outtake));
         resetArm.whileTrue(new TeleopArm(s_Arm, s_Intake, () -> -0.2));
         goToNote.whileTrue(new GoToNote(s_Swerve, s_Intake, s_NoteCamera));
-        playMusic.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
         estop.whileTrue(new MusicPlayer(s_Swerve, musicSelector));
+
+        /* Triggers */
+        slowIntakeTrigger.onTrue(new InstantCommand(() -> intakeMultiplier = 0.05));
+        slowIntakeTrigger.onFalse(new InstantCommand(() -> intakeMultiplier = 1));
+        operatorRunIntake.whileTrue(new TeleopIntake(s_Intake, () -> 4000 * intakeMultiplier, true));
     }
 
     /**

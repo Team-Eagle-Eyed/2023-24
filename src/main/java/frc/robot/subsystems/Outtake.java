@@ -15,15 +15,25 @@ public class Outtake extends SubsystemBase {
     private final CANSparkFlex outtakeTop = new CANSparkFlex(21, MotorType.kBrushless);
     private final RelativeEncoder outtakeEncoder = outtakeBottom.getEncoder();
 
+    private double velocitySetpoint;
+
+    public boolean atSpeed;
+
     public Outtake() {
         // Runs when calling new Launcher()
         configureMotors();
+        velocitySetpoint = 0;
     }
 
     @Override
     public void periodic() {
         // Stuff to run repeatedly
         SmartDashboard.putNumber("Launcher velocity", getVelocity());
+        if(outtakeBottom.getEncoder().getVelocity() > velocitySetpoint - 200) {
+            atSpeed = true;
+        } else {
+            atSpeed = false;
+        }
     }
 
     private void configureMotors() {
@@ -33,10 +43,19 @@ public class Outtake extends SubsystemBase {
         outtakeBottom.setOpenLoopRampRate(0.25);
         outtakeTop.setOpenLoopRampRate(0.25);
 
-        outtakeTop.setIdleMode(IdleMode.kBrake);
-        outtakeBottom.setIdleMode(IdleMode.kBrake);
+        outtakeTop.setIdleMode(IdleMode.kCoast);
+        outtakeBottom.setIdleMode(IdleMode.kCoast);
 
         outtakeTop.follow(outtakeBottom, true);
+
+        /*
+         * Closed loop PID for launcher
+         */
+        getOuttakePID().setP(0.0002);
+        getOuttakePID().setI(0);
+        getOuttakePID().setD(0);
+        getOuttakePID().setFF(0.000175);
+        getOuttakePID().setOutputRange(0, 1);
     }
 
     public void outtake(double speed) {
@@ -46,6 +65,7 @@ public class Outtake extends SubsystemBase {
 
     public void setOuttakeVelocity(double velocity) {
         outtakeBottom.getPIDController().setReference(velocity, ControlType.kVelocity);
+        velocitySetpoint = velocity;
     }
 
     public RelativeEncoder getOuttakeEncoder() {

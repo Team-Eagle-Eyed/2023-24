@@ -22,6 +22,8 @@ public class Arm extends SubsystemBase {
     public boolean hasOptimalAngle = false;
     public double optimalAngle = 0;
 
+    public boolean atSetpoint = false;
+
     public Arm(ApriltagCamera camera) {
         // Runs when calling new Template()
         configureMotors();
@@ -72,7 +74,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void drive(double speed) {
-        if ((getAbsoluteAdjustedPosition() > 175 && speed > 0) || (getAbsoluteAdjustedPosition() < 23 && speed < 0)) {
+        if ((getAbsoluteAdjustedPosition() > 175 && speed > 0) || (getAbsoluteAdjustedPosition() < 27 && speed < 0)) {
             leftMotor.set(0);
         } else if (speed == 0) {
             leftMotor.set(Math.cos(Units.degreesToRadians(getAbsoluteEncoder().getPosition())) * 0.015);
@@ -95,6 +97,6 @@ public class Arm extends SubsystemBase {
     }
 
     public Double getAbsoluteAdjustedPosition() {
-        return leftMotor.getAbsoluteEncoder().getPosition() - 106;
+        return leftMotor.getAbsoluteEncoder().getPosition() - 103; // -106
     }
 }

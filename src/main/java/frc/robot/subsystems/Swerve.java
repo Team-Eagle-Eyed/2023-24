@@ -43,6 +43,8 @@ public class Swerve extends SubsystemBase implements PositionListener {
     public boolean hasOptimalAngle = false;
     public double optimalAngle = 0;
 
+    public boolean rotationAtSetpoint = false;
+
     public Swerve(ApriltagCamera camera) {
         gyro = new Pigeon2(Constants.Swerve.pigeonID, "CANivore");
         gyro.getConfigurator().apply(new Pigeon2Configuration());

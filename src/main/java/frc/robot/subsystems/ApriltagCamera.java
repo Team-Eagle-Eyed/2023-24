@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.text.html.Option;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -108,10 +110,10 @@ public class ApriltagCamera extends SubsystemBase {
     }
 
     private void updateGlobalVariables() {
-        if(getSpeakerTag().isPresent()) {
-            PhotonTrackedTarget target = getSpeakerTag().get();
-            rangeToSpeaker = Optional.of(getSpecificTargetRange(target));
-            targetAngle = Optional.of(target.getYaw());
+        Optional<PhotonTrackedTarget> target = getSpeakerTag();
+        if(target.isPresent()) {
+            rangeToSpeaker = Optional.of(getSpecificTargetRange(target.get()));
+            targetAngle = Optional.of(target.get().getYaw());
         } else {
             rangeToSpeaker = Optional.empty();
             targetAngle = Optional.empty();

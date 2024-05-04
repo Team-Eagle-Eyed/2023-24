@@ -1,34 +1,35 @@
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
-import org.photonvision.targeting.PhotonTrackedTarget;
-
-import com.revrobotics.CANSparkBase.ControlType;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
+import frc.robot.subsystems.Swerve;
 
 
 public class LaunchNote extends Command {
 
-    private Outtake launcher;
-    private DoubleSupplier velocity;
+    private Swerve swerve;
     private Intake intake;
+    private Outtake outtake;
+    private Arm arm;
 
     boolean targetPresent;
-    PhotonTrackedTarget target;
+
+    boolean targetCentered;
+    boolean launcherAtSpeed;
+    boolean armAtSetpoint;
 
     private Timer finishedTimer = new Timer();
 
-    public LaunchNote(Outtake launcher, Intake intake, DoubleSupplier velocity) {
-        addRequirements(launcher, intake);
-        this.launcher = launcher;
+    public LaunchNote(Swerve swerve, Intake intake, Outtake outtake, Arm arm) {
+        addRequirements(intake);
+        this.swerve = swerve;
         this.intake = intake;
-        this.velocity = velocity;
+        this.outtake = outtake;
+        this.arm = arm;
     }
 
     @Override
@@ -37,32 +38,16 @@ public class LaunchNote extends Command {
 
         targetPresent = false;
         finishedTimer.start();
-    
-        /*
-         * Closed loop PID for launcher
-         */
-        launcher.getOuttakePID().setP(0.0002);
-        launcher.getOuttakePID().setI(0);
-        launcher.getOuttakePID().setD(0);
-        launcher.getOuttakePID().setFF(0.000175);
-        launcher.getOuttakePID().setOutputRange(0, 1);
+
+        targetCentered = false;
+        launcherAtSpeed = false;
+        armAtSetpoint = false;
+
 
     }
 
     @Override
     public void execute() {
-        /*
-         * Outputs
-         */
-
-        double targetVelocity = velocity.getAsDouble(); // Get velocity
-        launcher.getOuttakePID().setReference(targetVelocity, ControlType.kVelocity);
-
-
-        /*
-         * Checking conditions before launch
-         */
-        boolean launcherAtSpeed = launcher.getVelocity() > targetVelocity - 200;
 
         /*
          * Checking if we can launch
@@ -70,36 +55,52 @@ public class LaunchNote extends Command {
          * 2. The turncontroller is within the tolerance for facing the target, OR we didn't have a valid target to turn to
          * 3. The arm is at the correct angle
          */
-        if(launcherAtSpeed) {
+        /* if(launcherAtSpeed) {
             intake.intake(1); // run the intake to push it into the launcher
         } else { // otherwise
             intake.intake(0); // don't run the intake
             finishedTimer.restart();
+        } */
+        
+        if(swerve.hasOptimalAngle) {
+            // Target is centered when the robot angle is within +- 0.5 degrees of the optimal angle;
+            targetCentered = swerve.getHeading().getDegrees() < swerve.optimalAngle + 0.5 && swerve.getHeading().getDegrees() > swerve.optimalAngle - 0.5;
+        } else {
+            targetCentered = false;
         }
 
+        if(arm.hasOptimalAngle) {
+            // Arm is at the setpoint when it is within 1 degree of the optimal angle;
+            armAtSetpoint = arm.getAbsoluteAdjustedPosition() < arm.optimalAngle + 1 && arm.getAbsoluteAdjustedPosition() > arm.optimalAngle - 1;
+        } else {
+            armAtSetpoint = false;
+        }
+        
+        launcherAtSpeed = outtake.getOuttakeEncoder().getVelocity() > SmartDashboard.getNumber("Launcher set velocity", 4500) - 200;
 
-        /*
-         * Put checks to dashboard
-         */
-        SmartDashboard.putBoolean("launcherAtSpeed", launcherAtSpeed);
+        if(targetCentered && launcherAtSpeed && armAtSetpoint || true) {
+            intake.intake(1);
+        } else {
+            intake.intake(0);
+            finishedTimer.restart();
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
         // Runs when ended/cancelled
-        launcher.getOuttakePID().setP(0); // set p to 0 as to not brake the motor
-        launcher.outtake(0);
         intake.intake(0);
         finishedTimer.stop();
     }
 
     @Override
     public boolean isFinished() {
-        if(finishedTimer.get() > 0.25) {
+        /* if(finishedTimer.get() > 0.25) {
             return true;
         } else {
             return false;
-        }
+        } */
+        return false;
         // Whether or not the command is finished
     }
 }
