@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
 import frc.robot.Constants;
-import frc.robot.PositionListener;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -10,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonUtils;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Swerve extends SubsystemBase implements PositionListener {
+public class Swerve extends SubsystemBase {
     public SwerveDrivePoseEstimator mPoseEstimator; 
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
@@ -98,17 +98,6 @@ public class Swerve extends SubsystemBase implements PositionListener {
             },
             this // Reference to this subsystem to set requirements
     );
-    }
-
-    @Override
-    public void onPositionUpdate(Optional<EstimatedRobotPose> newPosition) {
-        if(newPosition.isPresent() && mPoseEstimator != null) {
-            /* mPoseEstimator.addVisionMeasurement(
-                newPosition.get().estimatedPose.toPose2d(),
-                newPosition.get().timestampSeconds
-                ); */
-            setPose(newPosition.get().estimatedPose.toPose2d());
-        }
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -251,7 +240,24 @@ public class Swerve extends SubsystemBase implements PositionListener {
             optimalAngle = getHeading().getDegrees() - camera.targetAngle.get() + 2.15;
             hasOptimalAngle = true;
         } else {
-            hasOptimalAngle = false;
+            optimalAngle = MathUtil.inputModulus(
+                PhotonUtils.getYawToPose(getPose(), camera.getSpeakerPose()).getDegrees() - (getHeading().getDegrees() * -1) + 180,
+                -180,
+                180
+                );
+            hasOptimalAngle = true;
+        }
+
+        if(hasOptimalAngle) {
+            SmartDashboard.putNumber("driveOptimalAngle", optimalAngle);
+        }
+        SmartDashboard.putNumber("CurrentHeading", getHeading().getDegrees());
+        SmartDashboard.putNumber("yawToSpeaker", PhotonUtils.getYawToPose(getPose(), camera.getSpeakerPose()).getDegrees());
+
+        Optional<EstimatedRobotPose> estimatedPose = camera.getEstimatedGlobalPose();
+        if(estimatedPose.isPresent()) {
+            mPoseEstimator.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), estimatedPose.get().timestampSeconds);
+            // setHeading(estimatedPose.get().estimatedPose.toPose2d().getRotation());
         }
 
         for(SwerveModule mod : mSwerveMods) {

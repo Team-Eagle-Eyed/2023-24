@@ -43,7 +43,7 @@ public class TeleopSwerve extends Command {
 
     @Override
     public void initialize() {
-        rotationController = new PIDController(0.02, 0, 0.001); // 0.3 I?
+        rotationController = new PIDController(0.017, 0, 0.002); // 0.3 I?
         rotationController.setTolerance(0.5);
         timer.start();
     }
