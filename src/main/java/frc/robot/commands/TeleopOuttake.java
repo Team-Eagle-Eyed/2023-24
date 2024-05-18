@@ -4,8 +4,10 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
 
@@ -14,13 +16,18 @@ public class TeleopOuttake extends Command {
 
     private Outtake outtake;
     private Intake intake;
+    private Arm arm;
     private DoubleSupplier outtakeSpeed;
     private Boolean useRPMs;
 
-    public TeleopOuttake(Outtake outtake, Intake intake, DoubleSupplier outtakeSpeed, Boolean useRPMs) {
+    private Timer timer;
+    private Timer spinDownTimer;
+
+    public TeleopOuttake(Outtake outtake, Intake intake, Arm arm, DoubleSupplier outtakeSpeed, Boolean useRPMs) {
         addRequirements(outtake);
         this.outtake = outtake;
         this.intake = intake;
+        this.arm = arm;
         this.outtakeSpeed = outtakeSpeed;
         this.useRPMs = useRPMs;
     }
@@ -28,13 +35,23 @@ public class TeleopOuttake extends Command {
     @Override
     public void initialize() {
         // Runs once on start
+        timer = new Timer();
+        timer.restart();
+
+        spinDownTimer = new Timer();
+        spinDownTimer.restart();
     }
 
     @Override
     public void execute() {
         // Runs repeatedly after initialization
         if(useRPMs) {
-            if(!intake.getSecondaryNoteSensor().get()) {
+            if(intake.getSecondaryNoteSensor().get()) {
+                timer.restart();
+            } else {
+                spinDownTimer.restart();
+            }
+            if((!intake.getSecondaryNoteSensor().get() && timer.get() > 0.4) || (intake.getSecondaryNoteSensor().get() && spinDownTimer.get() < 0.5) && arm.getAbsoluteAdjustedPosition() < 90) {
                 outtake.setOuttakeVelocity(outtakeSpeed.getAsDouble());
             } else {
                 outtake.outtake(0);

@@ -68,6 +68,7 @@ public class ApriltagCamera extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Has target", camera.getLatestResult().hasTargets());
         SmartDashboard.putNumber("rangeToTarget", getTargetRange());
+        SmartDashboard.putBoolean("validTarget", getSpeakerTag().isPresent());
         updateGlobalVariables();
     }
 

@@ -39,6 +39,7 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton driverIntake = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final JoystickButton driverLaunchNote = new JoystickButton(driver, XboxController.Button.kX.value);
     private final JoystickButton resetWheels = new JoystickButton(driver, XboxController.Button.kB.value);
 
     /* Operator Controls */
@@ -109,12 +110,14 @@ public class RobotContainer {
             ));
         NamedCommands.registerCommand("alignForShot", new TurnToAngle(s_Swerve, () -> 0));
 
-        musicSelector.setDefaultOption("Imperial March", "imperial_march.chrp");
+        musicSelector.setDefaultOption("William Tell Overture", "william_tell_overture_finale.chrp");
+        musicSelector.addOption("Winter Vivaldi", "vivaldi_winter.chrp");
+        musicSelector.addOption("Imperial March", "imperial_march.chrp");
         musicSelector.addOption("Megalovania", "megalovania.chrp");
         musicSelector.addOption("Night on Bald Mountain", "night_on_bald_mountain.chrp");
         musicSelector.addOption("Sandstorm", "sandstorm.chrp");
         musicSelector.addOption("Mii Channel", "mii_channel.chrp");
-        musicSelector.addOption("William Tell Overture", "william_tell_overture_finale.chrp");
+        musicSelector.addOption("Jeopardy", "jeopardy.chrp");
 
         autoChooser = AutoBuilder.buildAutoChooser();
         
@@ -134,6 +137,7 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
+                s_Arm,
                 s_Intake,
                 s_ApriltagCamera,
                 () -> -driver.getRawAxis(translationAxis) * driver.getRawAxis(speedAxis) * SmartDashboard.getNumber("SpeedLimit", 1),
@@ -164,6 +168,7 @@ public class RobotContainer {
             new TeleopOuttake(
                 s_Outtake,
                 s_Intake,
+                s_Arm,
                 () -> SmartDashboard.getNumber("Launcher set velocity", 4500),
                 true
             )
@@ -197,8 +202,15 @@ public class RobotContainer {
                                     s_Arm
                                     )
                                 );
+        driverLaunchNote.whileTrue(new LaunchNote(
+                                    s_Swerve,
+                                    s_Intake,
+                                    s_Outtake,
+                                    s_Arm
+                                    )
+                                );
         reverseIntake.whileTrue(new TeleopIntake(s_Intake, () -> -0.5, false));
-        reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, s_Intake, () -> -0.25, false));
+        reverseIntake.whileTrue(new TeleopOuttake(s_Outtake, s_Intake, s_Arm, () -> -0.25, false));
         resetWheels.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
         raiseArm.whileTrue(new SetArmPosition(s_Arm, () -> 57));
         ampShot.whileTrue(new AmpShot(s_Arm, s_Intake, s_Outtake));

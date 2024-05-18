@@ -44,14 +44,14 @@ public class TeleopArm extends Command {
             arm.drive(output);
         } else if (timer.get() < 1) {
             arm.drive(0);
-        } else if (timer.get() > 1 && !intake.getSecondaryNoteSensor().get()) {
+        } else if (timer.get() > 1 && !intake.getSecondaryNoteSensor().get() && arm.getAbsoluteAdjustedPosition() < 90) {
             if(arm.hasOptimalAngle) {
                 positionController.setSetpoint(arm.optimalAngle);
                 arm.drive(positionController.calculate(arm.getAbsoluteAdjustedPosition()));
             } else {
                 arm.drive(0);
             }
-        } else if (timer.get() > 1 && intake.getSecondaryNoteSensor().get()) {
+        } else if (timer.get() > 1 && intake.getSecondaryNoteSensor().get() && arm.getAbsoluteAdjustedPosition() < 90) {
             arm.drive(-0.2);
         }
         

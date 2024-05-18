@@ -29,11 +29,12 @@ public class Outtake extends SubsystemBase {
     public void periodic() {
         // Stuff to run repeatedly
         SmartDashboard.putNumber("Launcher velocity", getVelocity());
-        if(outtakeBottom.getEncoder().getVelocity() > velocitySetpoint - 200) {
+        if(outtakeBottom.getEncoder().getVelocity() > velocitySetpoint - 200 && outtakeBottom.getEncoder().getVelocity() > 200) {
             atSpeed = true;
         } else {
             atSpeed = false;
         }
+        SmartDashboard.putBoolean("launcherAtSpeed", atSpeed);
     }
 
     private void configureMotors() {

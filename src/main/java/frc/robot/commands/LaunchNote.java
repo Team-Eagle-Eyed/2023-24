@@ -64,7 +64,7 @@ public class LaunchNote extends Command {
         
         if(swerve.hasOptimalAngle) {
             // Target is centered when the robot angle is within +- 0.5 degrees of the optimal angle;
-            targetCentered = swerve.getHeading().getDegrees() < swerve.optimalAngle + 0.5 && swerve.getHeading().getDegrees() > swerve.optimalAngle - 0.5;
+            targetCentered = swerve.getHeading().getDegrees() < swerve.optimalAngle + 1 && swerve.getHeading().getDegrees() > swerve.optimalAngle - 1;
         } else {
             targetCentered = false;
         }
@@ -78,7 +78,7 @@ public class LaunchNote extends Command {
         
         launcherAtSpeed = outtake.getOuttakeEncoder().getVelocity() > SmartDashboard.getNumber("Launcher set velocity", 4500) - 200;
 
-        if(targetCentered && launcherAtSpeed && armAtSetpoint || true) {
+        if(targetCentered && launcherAtSpeed && armAtSetpoint) {
             intake.intake(1);
         } else {
             intake.intake(0);

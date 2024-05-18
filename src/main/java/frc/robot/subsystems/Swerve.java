@@ -35,6 +35,7 @@ public class Swerve extends SubsystemBase {
     public SwerveDrivePoseEstimator mPoseEstimator; 
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
+    Orchestra orchestra = new Orchestra();
 
     private ApriltagCamera camera;
 
@@ -61,6 +62,13 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
+
+        for (TalonFX motor : getModuleDriveMotors()) {
+            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
+        }
+        for (TalonFX motor : getModuleAngleMotors()) {
+            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
+        }
 
         mPoseEstimator = new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics,
@@ -175,13 +183,6 @@ public class Swerve extends SubsystemBase {
     }
 
     public Orchestra getOrchestra() {
-        Orchestra orchestra = new Orchestra();
-        for (TalonFX motor : getModuleDriveMotors()) {
-            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
-        }
-        for (TalonFX motor : getModuleAngleMotors()) {
-            orchestra.addInstrument(motor, motor.getDeviceID() - 1);
-        }
         return orchestra;
     }
 
@@ -253,6 +254,8 @@ public class Swerve extends SubsystemBase {
         }
         SmartDashboard.putNumber("CurrentHeading", getHeading().getDegrees());
         SmartDashboard.putNumber("yawToSpeaker", PhotonUtils.getYawToPose(getPose(), camera.getSpeakerPose()).getDegrees());
+
+        SmartDashboard.putBoolean("rotationAtSetpoint", rotationAtSetpoint);
 
         Optional<EstimatedRobotPose> estimatedPose = camera.getEstimatedGlobalPose();
         if(estimatedPose.isPresent()) {

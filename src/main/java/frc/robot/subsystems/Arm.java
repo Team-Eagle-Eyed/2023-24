@@ -38,6 +38,8 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Right Motor position", rightMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Left Motor absolute position", getAbsoluteAdjustedPosition());
 
+        SmartDashboard.putBoolean("armAtSetpoint", atSetpoint);
+
 
         if(camera.rangeToSpeaker.isPresent()) {
             optimalAngle = MathUtil.clamp(

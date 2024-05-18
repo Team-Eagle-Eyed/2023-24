@@ -26,7 +26,9 @@ public class MusicPlayer extends Command {
 
     @Override
     public void execute() {
-        orchestra.play();
+        if(!orchestra.isPlaying()) {
+            orchestra.play();
+        }
         SmartDashboard.putBoolean("isPlaying", orchestra.isPlaying());
     }
 
