@@ -39,9 +39,10 @@ public class TeleopArm extends Command {
     public void execute() {
         // Runs repeatedly after initialization
         double output = MathUtil.applyDeadband(speed.getAsDouble(), Constants.stickDeadband);
+
         if(output != 0) {
             timer.restart();
-            arm.drive(output);
+            arm.drive(arm.getAbsoluteAdjustedPosition() < 40 && output < 0 ? output / 5 : output);
         } else if (timer.get() < 1) {
             arm.drive(0);
         } else if (timer.get() > 1 && !intake.getSecondaryNoteSensor().get() && arm.getAbsoluteAdjustedPosition() < 90) {
