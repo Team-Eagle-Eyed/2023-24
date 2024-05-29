@@ -91,13 +91,11 @@ public class GoToNote extends Command {
 
         boolean intakeSensorTripped = !m_intake.getNoteSensor().get();
         boolean outtakeSensorTripped = !m_intake.getSecondaryNoteSensor().get();
-        if(noteCentered == true && !(!intakeSensorTripped && outtakeSensorTripped)) {
-            m_intake.setIntakeVelocity(2500);
-        } else if (!intakeSensorTripped && outtakeSensorTripped) {
+        if(targetAcquired) {
+            m_intake.setIntakeVelocity(4500);
+        }
+        if (!intakeSensorTripped && outtakeSensorTripped) {
             finishedCount = finishedCount + 1;
-            m_intake.setIntakeVelocity(0);
-        } else {
-            m_intake.setIntakeVelocity(0);
         }
 
         /* if(m_intake.getNoteSensor().get() && !m_intake.getSecondaryNoteSensor().get()) {

@@ -27,6 +27,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -258,7 +259,7 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putBoolean("rotationAtSetpoint", rotationAtSetpoint);
 
         Optional<EstimatedRobotPose> estimatedPose = camera.getEstimatedGlobalPose();
-        if(estimatedPose.isPresent()) {
+        if(estimatedPose.isPresent() && !DriverStation.isAutonomous()) {
             mPoseEstimator.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), estimatedPose.get().timestampSeconds);
             // setHeading(estimatedPose.get().estimatedPose.toPose2d().getRotation());
         }

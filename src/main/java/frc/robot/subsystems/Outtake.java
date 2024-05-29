@@ -44,8 +44,8 @@ public class Outtake extends SubsystemBase {
         outtakeBottom.setOpenLoopRampRate(0.25);
         outtakeTop.setOpenLoopRampRate(0.25);
 
-        outtakeTop.setIdleMode(IdleMode.kCoast);
-        outtakeBottom.setIdleMode(IdleMode.kCoast);
+        outtakeTop.setIdleMode(IdleMode.kBrake);
+        outtakeBottom.setIdleMode(IdleMode.kBrake);
 
         outtakeTop.follow(outtakeBottom, true);
 

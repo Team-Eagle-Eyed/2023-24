@@ -55,8 +55,6 @@ public class Intake extends SubsystemBase {
             }
         } else if (!noteSensor.get()){
             intakeBottom.set(-0.25);
-        } else {
-            intakeBottom.set(0);
         }
     }
 

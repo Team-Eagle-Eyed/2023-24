@@ -73,9 +73,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "lowerArm"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "lowerArm"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.5
+                      }
+                    }
+                  ]
                 }
               }
             ]
